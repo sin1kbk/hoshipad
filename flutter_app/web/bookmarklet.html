@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hoshipad ブックマークレット - Safariから簡単レシピ保存</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .bookmarklet-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .bookmarklet-button {
+            display: inline-block;
+            background: white;
+            color: #f5576c;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .bookmarklet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .bookmarklet-button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            margin-top: 3rem;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+            padding-left: 0.5rem;
+        }
+
+        .note {
+            background: #fff9e6;
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 1.5rem 0;
+            border-radius: 5px;
+        }
+
+        .note strong {
+            color: #e67e22;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .demo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .demo-url {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .bookmarklet-button {
+                font-size: 1.1rem;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 hoshipad ブックマークレット</h1>
+        <p class="subtitle">Safariでレシピページを見ている時に、このブックマークをタップするだけで<br>hoshipadに保存できます！</p>
+
+        <div class="bookmarklet-box">
+            <p style="color: white; margin-bottom: 1rem; font-size: 1.1rem;">
+                下のボタンを長押しして、ブックマークに追加してください
+            </p>
+            <a href="javascript:(function(){const url=window.location.href;const title=document.title;window.open('__HOSHIPAD_URL__/add?url='+encodeURIComponent(url)+'&title='+encodeURIComponent(title),'_blank');})();"
+               class="bookmarklet-button">
+                📌 hoshipadに保存
+            </a>
+        </div>
+
+        <div class="note">
+            <strong>🔧 設定:</strong> このブックマークレットのURLは <code>__HOSHIPAD_URL__</code> に設定されています。ビルド時に環境変数で置き換えられます。
+        </div>
+
+        <div class="feature-list">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">1タップで保存</div>
+                <div>ブックマークバーから簡単アクセス</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔗</div>
+                <div class="feature-title">URL自動入力</div>
+                <div>レシピのURLが自動で入力されます</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📝</div>
+                <div class="feature-title">タイトル自動入力</div>
+                <div>ページタイトルも自動取得</div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>📱 インストール方法（iOS Safari）</h2>
+            <ol>
+                <li>上の「📌 hoshipadに保存」ボタンを<strong>長押し</strong></li>
+                <li>メニューから「ブックマークに追加」を選択</li>
+                <li>保存場所を「お気に入り」に設定（ブックマークバーに表示されます）</li>
+                <li>「保存」をタップ</li>
+                <li>完了！🎉</li>
+            </ol>
+
+            <h2>💻 インストール方法（デスクトップ Safari/Chrome）</h2>
+            <ol>
+                <li>ブックマークバーを表示（Safari: ⌘⇧B / Chrome: ⌘⇧B）</li>
+                <li>上の「📌 hoshipadに保存」ボタンをブックマークバーに<strong>ドラッグ&ドロップ</strong></li>
+                <li>完了！🎉</li>
+            </ol>
+
+            <h2>🚀 使い方</h2>
+            <ol>
+                <li>Safariで<strong>Cookpad</strong>や<strong>クラシル</strong>などのレシピページを開く</li>
+                <li>画面下部の<strong>ブックマークバー</strong>または<strong>ブックマークメニュー</strong>から「📌 hoshipadに保存」をタップ</li>
+                <li>新しいタブで<strong>hoshipadのレシピ追加画面</strong>が開きます</li>
+                <li>URLとタイトルが自動入力されているので、必要に応じて編集して保存！</li>
+            </ol>
+
+            <h2>🔧 技術的な説明</h2>
+            <p>このブックマークレットは、以下のように動作します：</p>
+            <div class="demo">
+                <p><strong>現在のページ:</strong> https://cookpad.com/recipe/123456</p>
+                <p><strong>ページタイトル:</strong> 美味しい肉じゃがのレシピ</p>
+                <p><strong>↓ ブックマークレット実行 ↓</strong></p>
+                <p><strong>開かれるURL:</strong></p>
+                <div class="demo-url">
+                    __HOSHIPAD_URL__/add?url=https%3A%2F%2Fcookpad.com%2Frecipe%2F123456&title=%E7%BE%8E%E5%91%B3%E3%81%97%E3%81%84%E8%82%89%E3%81%98%E3%81%8C%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94
+                </div>
+            </div>
+
+            <h2>💡 ヒント</h2>
+            <ul style="list-style: none; margin-left: 0;">
+                <li>✨ ブックマークの名前は自由に変更できます（例: 「hoshipad」「保存」など）</li>
+                <li>✨ 複数のデバイスでSafariを同期している場合、一度追加すれば全デバイスで使えます</li>
+                <li>✨ Cookpad、クラシル、デリッシュキッチンなど、どのレシピサイトでも使えます</li>
+            </ul>
+
+            <div class="note" style="margin-top: 2rem;">
+                <strong>📱 iOS アプリ版も利用可能！</strong><br>
+                iOSネイティブアプリ版のhoshipadでは、Safariの標準共有メニューから直接レシピを保存できます。
+                より快適な体験をお求めの方は、App Storeからダウンロードしてください。
+            </div>
+        </div>
+    </div>
+</body>
+</html>

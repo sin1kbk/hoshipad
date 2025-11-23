@@ -6,8 +6,15 @@ import '../providers/recipe_provider.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   final Recipe? recipe;
+  final String? sharedUrl;
+  final String? prefilledTitle;
 
-  const AddRecipeScreen({super.key, this.recipe});
+  const AddRecipeScreen({
+    super.key,
+    this.recipe,
+    this.sharedUrl,
+    this.prefilledTitle,
+  });
 
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
@@ -26,6 +33,20 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   @override
   void initState() {
     super.initState();
+
+    // 共有されたURLがある場合は自動設定
+    if (widget.sharedUrl != null) {
+      _urlController.text = widget.sharedUrl!;
+      debugPrint('Shared URL set to form: ${widget.sharedUrl}');
+    }
+
+    // 事前入力されたタイトルがある場合は自動設定
+    if (widget.prefilledTitle != null && widget.prefilledTitle!.isNotEmpty) {
+      _titleController.text = widget.prefilledTitle!;
+      debugPrint('Prefilled title set to form: ${widget.prefilledTitle}');
+    }
+
+    // 編集モードの場合は既存のレシピデータを設定
     if (widget.recipe != null) {
       final recipe = widget.recipe!;
       _titleController.text = recipe.title;
