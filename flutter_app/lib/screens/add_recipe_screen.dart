@@ -5,7 +5,9 @@ import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 
 class AddRecipeScreen extends StatefulWidget {
-  const AddRecipeScreen({super.key});
+  final Recipe? recipe;
+
+  const AddRecipeScreen({super.key, this.recipe});
 
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
@@ -22,6 +24,22 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   RecipeCategory _selectedCategory = RecipeCategory.meat;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.recipe != null) {
+      final recipe = widget.recipe!;
+      _titleController.text = recipe.title;
+      _urlController.text = recipe.url;
+      _imageUrlController.text = recipe.imageUrl;
+      if (recipe.notes != null) {
+        _notesController.text = recipe.notes!;
+      }
+      _selectedSource = recipe.source;
+      _selectedCategory = recipe.category;
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _urlController.dispose();
@@ -34,7 +52,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('レシピを書く'),
+        title: Text(widget.recipe != null ? 'レシピを編集' : 'レシピを書く'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
@@ -232,18 +250,28 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
 
     try {
-      await context.read<RecipeProvider>().createRecipe(recipe);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('レシピが正常に追加されました！')),
-        );
-        context.pop();
+      if (widget.recipe != null) {
+        await context.read<RecipeProvider>().updateRecipe(widget.recipe!.id, recipe);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('レシピが更新されました！')),
+          );
+          context.pop();
+        }
+      } else {
+        await context.read<RecipeProvider>().createRecipe(recipe);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('レシピが正常に追加されました！')),
+          );
+          context.pop();
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('レシピの追加に失敗しました: $e'),
+            content: Text('レシピの保存に失敗しました: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

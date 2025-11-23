@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../widgets/recipe_card.dart';
+import 'recipe_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,27 +42,28 @@ class _HomeScreenState extends State<HomeScreen> {
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: InkWell(
-              onTap: () {
-                // Navigate to search
+            child: TextField(
+              onSubmitted: (value) {
+                context.read<RecipeProvider>().setSearchQuery(value);
               },
-              child: Container(
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
+              decoration: InputDecoration(
+                hintText: '料理名・食材で検索',
+                hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 20),
+                filled: true,
+                fillColor: Colors.grey[100],
+                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: Colors.grey[300]!),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
                 ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    Icon(Icons.search, color: Colors.grey[500], size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      '料理名・食材で検索',
-                      style: TextStyle(color: Colors.grey[500], fontSize: 14),
-                    ),
-                  ],
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: const BorderSide(color: Color(0xFFFF7400)),
                 ),
               ),
             ),
@@ -113,6 +115,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         final recipe = provider.recipes[index];
                         return RecipeCard(
                           recipe: recipe,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => RecipeDetailScreen(recipe: recipe),
+                              ),
+                            );
+                          },
                           onDelete: () => _deleteRecipe(context, recipe),
                         );
                       },
