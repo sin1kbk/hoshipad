@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../widgets/recipe_card.dart';
-import '../widgets/search_bar.dart' as app;
-import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,8 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _showCategories = true;
-
   @override
   void initState() {
     super.initState();
@@ -28,58 +25,100 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Icon(Icons.restaurant_menu, color: Color(0xFF6366F1)),
-            const SizedBox(width: 8),
-            Text(
-              'hoshipad',
-              style: Theme.of(context).appBarTheme.titleTextStyle,
-            ),
-          ],
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'hoshipad',
+          style: GoogleFonts.poppins(
+            color: const Color(0xFFFF7400),
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/add'),
-              icon: const Icon(Icons.add),
-              label: const Text('レシピを追加'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: InkWell(
+              onTap: () {
+                // Navigate to search
+              },
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 12),
+                    Icon(Icons.search, color: Colors.grey[500], size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      '料理名・食材で検索',
+                      style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.grey),
+            onPressed: () {},
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Consumer<RecipeProvider>(
         builder: (context, provider, child) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(16),
-                  child: app.SearchBar(
-                    searchQuery: provider.searchQuery,
-                    onSearchChanged: (query) {
-                      provider.setSearchQuery(query);
-                      setState(() => _showCategories = false);
-                    },
-                    sourceFilter: provider.sourceFilter,
-                    onSourceChanged: provider.setSourceFilter,
-                    categoryFilter: provider.categoryFilter,
-                    onCategoryChanged: (category) {
-                      provider.setCategoryFilter(category);
-                      setState(() => _showCategories = false);
-                    },
-                  ),
-                ),
-                if (_showCategories &&
-                    provider.categoryFilter == null &&
-                    provider.searchQuery.isEmpty) ...[
-                  _buildCategoryGrid(context, provider),
-                ] else ...[
-                  _buildRecipeGrid(context, provider),
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (provider.error != null) {
+            return Center(child: Text('エラー: ${provider.error}'));
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => provider.loadRecipes(),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCategoryList(context, provider),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle(context, '話題のレシピ'),
+                  const SizedBox(height: 16),
+                  if (provider.recipes.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Text('レシピがまだありません。\n下のボタンから追加してみましょう！'),
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: provider.recipes.length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 24), // Increased spacing
+                      itemBuilder: (context, index) {
+                        final recipe = provider.recipes[index];
+                        return RecipeCard(
+                          recipe: recipe,
+                          onDelete: () => _deleteRecipe(context, recipe),
+                        );
+                      },
+                    ),
                 ],
-              ],
+              ),
             ),
           );
         },
@@ -87,118 +126,52 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryGrid(BuildContext context, RecipeProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
+  Widget _buildCategoryList(BuildContext context, RecipeProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 16),
+          child: Text(
             'カテゴリーから探す',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
-          const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            children: RecipeCategory.values.map((category) {
-              return _CategoryCard(
-                category: category,
-                onTap: () {
-                  provider.setCategoryFilter(category);
-                  setState(() => _showCategories = false);
-                },
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecipeGrid(BuildContext context, RecipeProvider provider) {
-    if (provider.isLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (provider.error != null) {
-      return Padding(
-        padding: const EdgeInsets.all(32),
-        child: Center(
-          child: Text(
-            'エラー: ${provider.error}',
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
         ),
-      );
-    }
-
-    if (provider.recipes.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
-        child: Center(child: Text('レシピが見つかりませんでした')),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (provider.categoryFilter != null) ...[
-            Row(
-              children: [
-                TextButton.icon(
-                  onPressed: () {
-                    provider.setCategoryFilter(null);
-                    setState(() => _showCategories = true);
-                  },
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('カテゴリー一覧に戻る'),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  provider.categoryFilter!.displayName,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).size.width > 1024
-                  ? 4
-                  : MediaQuery.of(context).size.width > 768
-                      ? 3
-                      : 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: provider.recipes.length,
+        SizedBox(
+          height: 90, // Slightly adjusted height
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: RecipeCategory.values.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 20),
             itemBuilder: (context, index) {
-              final recipe = provider.recipes[index];
-              return RecipeCard(
-                recipe: recipe,
-                onDelete: () => _deleteRecipe(context, recipe),
+              final category = RecipeCategory.values[index];
+              final isSelected = provider.categoryFilter == category;
+              return _CategoryItem(
+                category: category,
+                isSelected: isSelected,
+                onTap: () {
+                  if (isSelected) {
+                    provider.setCategoryFilter(null);
+                  } else {
+                    provider.setCategoryFilter(category);
+                  }
+                },
               );
             },
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
     );
   }
 
@@ -240,39 +213,51 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _CategoryCard extends StatelessWidget {
+class _CategoryItem extends StatelessWidget {
   final RecipeCategory category;
+  final bool isSelected;
   final VoidCallback onTap;
 
-  const _CategoryCard({
+  const _CategoryItem({
     required this.category,
+    required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                _getCategoryIcon(category),
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                category.displayName,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-            ],
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: isSelected ? colorScheme.primary : Colors.orange[50],
+              shape: BoxShape.circle,
+              border: isSelected
+                  ? Border.all(color: colorScheme.primary, width: 2)
+                  : null,
+            ),
+            child: Icon(
+              _getCategoryIcon(category),
+              color: isSelected ? Colors.white : colorScheme.primary,
+              size: 32,
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            category.displayName,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? colorScheme.primary : Colors.grey[700],
+            ),
+          ),
+        ],
       ),
     );
   }

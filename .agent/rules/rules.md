@@ -36,7 +36,16 @@
 - [ ] **Recipe Detail View**: A dedicated screen to view full recipe details (currently opens URL directly?).
 - [ ] **Authentication**: (Optional) User login/signup.
 
-## 6. Design Guidelines
-- Use `AppTheme` for consistent styling.
-- Follow Flutter best practices for widget composition.
-- Ensure responsive design for different screen sizes.
+## 6. Design Guidelines (Cookpad-inspired)
+- **Color Palette**:
+    - **Primary**: Orange (`#FF7400` or similar warm orange) - Used for primary buttons, accents, and active states.
+    - **Background**: White (`#FFFFFF`) or very light gray (`#F5F5F5`) for content areas.
+    - **Text**: Dark Gray (`#333333`) for primary text, Lighter Gray (`#666666`) for secondary text.
+- **Typography**: Clean, sans-serif fonts (System default is fine, but styled for readability).
+- **Navigation**:
+    - Bottom Navigation Bar for main sections (Home, Search, Add, Profile).
+    - Floating Action Button (FAB) or prominent center button for "Add Recipe".
+- **Components**:
+    - **Recipe Card**: Large hero image (aspect ratio ~4:3 or 16:9), clear title, author info, and heart/like count.
+    - **Buttons**: Rounded corners, flat design with slight elevation for primary actions.
+    - **Inputs**: Clean text fields with clear labels and placeholders.

@@ -34,133 +34,184 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('新しいレシピを追加'),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 600),
-            padding: const EdgeInsets.all(16),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        '新しいレシピを追加',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _titleController,
-                        decoration: const InputDecoration(
-                          labelText: 'レシピのタイトル',
-                          hintText: 'レシピのタイトルを入力',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'タイトルを入力してください';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _urlController,
-                        decoration: const InputDecoration(
-                          labelText: 'レシピのURL',
-                          hintText: 'レシピのURLを入力',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'URLを入力してください';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _imageUrlController,
-                        decoration: const InputDecoration(
-                          labelText: '画像のURL',
-                          hintText: '画像のURLを入力',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return '画像URLを入力してください';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<RecipeSource>(
-                        initialValue: _selectedSource,
-                        decoration: const InputDecoration(
-                          labelText: 'ソース',
-                        ),
-                        items: RecipeSource.values.map((source) {
-                          return DropdownMenuItem(
-                            value: source,
-                            child: Text(source.displayName),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _selectedSource = value);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<RecipeCategory>(
-                        initialValue: _selectedCategory,
-                        decoration: const InputDecoration(
-                          labelText: '料理のカテゴリー',
-                        ),
-                        items: RecipeCategory.values.map((category) {
-                          return DropdownMenuItem(
-                            value: category,
-                            child: Text(category.displayName),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _selectedCategory = value);
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _notesController,
-                        decoration: const InputDecoration(
-                          labelText: 'メモ',
-                          hintText: 'レシピについてのメモを追加',
-                        ),
-                        maxLines: 4,
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => context.pop(),
-                            child: const Text('キャンセル'),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton(
-                            onPressed: _saveRecipe,
-                            child: const Text('保存'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+        title: const Text('レシピを書く'),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _saveRecipe,
+            child: const Text(
+              '保存',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image Upload Placeholder
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_a_photo, size: 48, color: Colors.grey[400]),
+                    const SizedBox(height: 8),
+                    Text(
+                      '料理の写真を登録',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionLabel('レシピのタイトル'),
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  hintText: '例：肉じゃが',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'タイトルを入力してください';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionLabel('レシピのURL (動画・記事など)'),
+              TextFormField(
+                controller: _urlController,
+                decoration: const InputDecoration(
+                  hintText: 'https://...',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.link),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'URLを入力してください';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _imageUrlController,
+                decoration: const InputDecoration(
+                  labelText: '画像のURL (一時的)',
+                  hintText: 'https://...',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.image),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '画像URLを入力してください';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionLabel('ソース'),
+                        DropdownButtonFormField<RecipeSource>(
+                          value: _selectedSource,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          ),
+                          items: RecipeSource.values.map((source) {
+                            return DropdownMenuItem(
+                              value: source,
+                              child: Text(source.displayName),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _selectedSource = value);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionLabel('カテゴリー'),
+                        DropdownButtonFormField<RecipeCategory>(
+                          value: _selectedCategory,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          ),
+                          items: RecipeCategory.values.map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Text(category.displayName),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _selectedCategory = value);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionLabel('メモ'),
+              TextFormField(
+                controller: _notesController,
+                decoration: const InputDecoration(
+                  hintText: 'コツやポイントなどを入力',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 4,
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
         ),
       ),
     );

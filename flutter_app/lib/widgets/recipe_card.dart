@@ -18,86 +18,138 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: CachedNetworkImage(
-                imageUrl: recipe.imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey[200],
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: CachedNetworkImage(
+                    imageUrl: recipe.imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[100],
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[100],
+                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                    ),
                   ),
                 ),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.error, color: Colors.red),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.favorite,
+                            color: Colors.pinkAccent, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          '128', // Placeholder for like count
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     recipe.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          height: 1.3,
                         ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
-                      _buildChip(
-                        context,
-                        recipe.category.displayName,
-                        Colors.blue,
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: Colors.orange[100],
+                        child: const Icon(Icons.person, size: 14, color: Colors.orange),
                       ),
                       const SizedBox(width: 8),
-                      _buildChip(
-                        context,
-                        recipe.source.displayName,
-                        Colors.green,
+                      Expanded(
+                        child: Text(
+                          recipe.source.displayName,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
-                  if (recipe.notes != null && recipe.notes!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      recipe.notes!,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
                   if (onEdit != null || onDelete != null) ...[
+                    const SizedBox(height: 12),
+                    const Divider(height: 1, color: Color(0xFFEEEEEE)),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         if (onEdit != null)
-                          IconButton(
-                            icon: const Icon(Icons.edit, size: 20),
+                          TextButton.icon(
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            label: const Text('編集'),
                             onPressed: onEdit,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey[600],
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              minimumSize: const Size(60, 36),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
                           ),
                         if (onDelete != null)
-                          IconButton(
-                            icon: const Icon(Icons.delete, size: 20),
+                          TextButton.icon(
+                            icon: const Icon(Icons.delete_outline, size: 18),
+                            label: const Text('削除'),
                             onPressed: onDelete,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red[400],
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              minimumSize: const Size(60, 36),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
                           ),
                       ],
                     ),
@@ -111,19 +163,5 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(BuildContext context, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: color,
-            ),
-      ),
-    );
-  }
+  // _buildChip removed as it's no longer used in this design
 }

@@ -8,6 +8,7 @@ import 'services/api_service.dart';
 import 'providers/recipe_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_recipe_screen.dart';
+import 'widgets/main_scaffold.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,14 +29,27 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final apiService = ApiService();
 
+    final rootNavigatorKey = GlobalKey<NavigatorState>();
+
     final router = GoRouter(
+      navigatorKey: rootNavigatorKey,
+      initialLocation: '/',
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen(),
+        ShellRoute(
+          builder: (context, state, child) {
+            return MainScaffold(child: child);
+          },
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => const HomeScreen(),
+            ),
+            // 他のルートもここに追加予定
+          ],
         ),
         GoRoute(
           path: '/add',
+          parentNavigatorKey: rootNavigatorKey, // ボトムナビの上に表示
           builder: (context, state) => const AddRecipeScreen(),
         ),
       ],
