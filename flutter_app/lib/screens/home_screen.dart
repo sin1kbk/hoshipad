@@ -243,11 +243,19 @@ class _CategoryItem extends StatelessWidget {
                   ? Border.all(color: colorScheme.primary, width: 2)
                   : null,
             ),
-            child: Icon(
-              _getCategoryIcon(category),
-              color: isSelected ? Colors.white : colorScheme.primary,
-              size: 32,
-            ),
+            child: category == RecipeCategory.meat
+                ? Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Image.asset(
+                      'assets/icons/meat.png',
+                      color: isSelected ? Colors.white : const Color(0xFFFF7400),
+                    ),
+                  )
+                : Icon(
+                    _getCategoryIcon(category),
+                    color: isSelected ? Colors.white : const Color(0xFFFF7400),
+                    size: 32,
+                  ),
           ),
           const SizedBox(height: 8),
           Text(
