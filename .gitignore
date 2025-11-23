@@ -1,3 +1,10 @@
-node_modules
-dist
+# Flutter
+flutter_app/.dart_tool/
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
+
+# Vercel
+.vercel
+
+# Environment
 .env*
