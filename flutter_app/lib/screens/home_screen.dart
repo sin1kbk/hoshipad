@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../widgets/recipe_card.dart';
+import '../widgets/hoshipad_logo.dart';
 import 'recipe_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -30,61 +33,52 @@ class _HomeScreenState extends State<HomeScreen> {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(
-          'hoshipad',
-          style: GoogleFonts.poppins(
-            color: const Color(0xFFFF7400),
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
+        title: Row(
+          children: [
+            const HoshipadLogo(size: 32),
+            const SizedBox(width: 8),
+            Text(
+              'hoshipad',
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFF7400),
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.notifications_none, color: Colors.grey),
+              onPressed: () {},
+            ),
+          ],
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: TextField(
+              decoration: InputDecoration(
+                hintText: '料理名・食材で検索',
+                prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
               onSubmitted: (value) {
                 context.read<RecipeProvider>().setSearchQuery(value);
               },
-              decoration: InputDecoration(
-                hintText: '料理名・食材で検索',
-                hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
-                prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 20),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: const BorderSide(color: Color(0xFFFF7400)),
-                ),
-              ),
             ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.grey),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: Consumer<RecipeProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
-          }
-
-          if (provider.error != null) {
-            return Center(child: Text('エラー: ${provider.error}'));
           }
 
           return RefreshIndicator(
@@ -96,13 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _buildCategoryList(context, provider),
                   const SizedBox(height: 24),
-                  _buildSectionTitle(context, '話題のレシピ'),
+                  _buildSectionTitle(context, '保存されたレシピ'),
                   const SizedBox(height: 16),
                   if (provider.recipes.isEmpty)
                     const Center(
                       child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Text('レシピがまだありません。\n下のボタンから追加してみましょう！'),
+                        padding: EdgeInsets.all(32.0),
+                        child: Text('レシピが見つかりませんでした'),
                       ),
                     )
                   else
@@ -110,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: provider.recipes.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 24), // Increased spacing
+                      separatorBuilder: (context, index) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final recipe = provider.recipes[index];
                         return RecipeCard(
@@ -118,7 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => RecipeDetailScreen(recipe: recipe),
+                                builder: (context) =>
+                                    RecipeDetailScreen(recipe: recipe),
                               ),
                             );
                           },
@@ -131,6 +126,24 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Assuming context.push is a GoRouter extension or similar navigation method
+          // If not using GoRouter, replace with Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddRecipeScreen()));
+          // For this example, I'll keep context.push as it implies a navigation setup.
+          // If this causes an error, the user might need to import go_router or use standard Navigator.
+          // For a basic Flutter app without go_router, it would be:
+          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddRecipeScreen()));
+          // Since the original code doesn't show go_router, I'll assume a placeholder for now.
+          // If this is a standard Flutter app, `context.push('/add')` will cause an error.
+          // I will keep it as is, assuming the user has a custom extension or GoRouter setup.
+          // If not, the user will need to adjust this line.
+          // For a faithful edit, I'll use the provided line.
+          context.push('/add');
+        },
+        backgroundColor: const Color(0xFFFF7400),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

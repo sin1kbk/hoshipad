@@ -2,16 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../models/recipe.dart';
+import '../providers/history_provider.dart';
 import 'add_recipe_screen.dart';
 
-class RecipeDetailScreen extends StatelessWidget {
+class RecipeDetailScreen extends StatefulWidget {
   final Recipe recipe;
 
   const RecipeDetailScreen({super.key, required this.recipe});
 
   @override
+  State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
+}
+
+class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<HistoryProvider>().addRecipe(widget.recipe);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final recipe = widget.recipe;
     return Scaffold(
       body: CustomScrollView(
         slivers: [

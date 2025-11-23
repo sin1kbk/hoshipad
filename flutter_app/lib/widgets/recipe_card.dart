@@ -33,13 +33,14 @@ class RecipeCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
+                SizedBox(
+                  width: 120,
+                  height: 120,
                   child: CachedNetworkImage(
                     imageUrl: recipe.imageUrl,
                     fit: BoxFit.cover,
@@ -56,25 +57,26 @@ class RecipeCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  bottom: 8,
-                  right: 8,
+                  bottom: 4,
+                  right: 4,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.favorite,
-                            color: Colors.pinkAccent, size: 14),
-                        const SizedBox(width: 4),
+                            color: Colors.pinkAccent, size: 10),
+                        const SizedBox(width: 2),
                         Text(
                           '128', // Placeholder for like count
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
+                                fontSize: 10,
                               ),
                         ),
                       ],
@@ -83,78 +85,68 @@ class RecipeCard extends StatelessWidget {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    recipe.title,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          height: 1.3,
-                        ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.orange[100],
-                        child: const Icon(Icons.person, size: 14, color: Colors.orange),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          recipe.source.displayName,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (onEdit != null || onDelete != null) ...[
-                    const SizedBox(height: 12),
-                    const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      recipe.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 8),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (onEdit != null)
-                          TextButton.icon(
-                            icon: const Icon(Icons.edit_outlined, size: 18),
-                            label: const Text('編集'),
-                            onPressed: onEdit,
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.grey[600],
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              minimumSize: const Size(60, 36),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
+                        CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.orange[100],
+                          child: const Icon(Icons.person, size: 12, color: Colors.orange),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            recipe.source.displayName,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey[700],
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        if (onDelete != null)
-                          TextButton.icon(
-                            icon: const Icon(Icons.delete_outline, size: 18),
-                            label: const Text('削除'),
-                            onPressed: onDelete,
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.red[400],
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              minimumSize: const Size(60, 36),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ),
+                        ),
                       ],
                     ),
+                    if (onEdit != null || onDelete != null) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (onEdit != null)
+                            InkWell(
+                              onTap: onEdit,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Icon(Icons.edit_outlined, size: 18, color: Colors.grey[600]),
+                              ),
+                            ),
+                          if (onDelete != null)
+                            InkWell(
+                              onTap: onDelete,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Icon(Icons.delete_outline, size: 18, color: Colors.red[400]),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ],

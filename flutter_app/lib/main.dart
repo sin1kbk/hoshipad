@@ -6,8 +6,14 @@ import 'config/supabase_config.dart';
 import 'theme/app_theme.dart';
 import 'services/api_service.dart';
 import 'providers/recipe_provider.dart';
+import 'providers/shopping_list_provider.dart';
+import 'providers/history_provider.dart';
+import 'services/local_storage_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_recipe_screen.dart';
+import 'screens/shopping_list_screen.dart';
+import 'screens/history_screen.dart';
+import 'screens/my_kitchen_screen.dart';
 import 'widgets/main_scaffold.dart';
 
 Future<void> main() async {
@@ -44,6 +50,18 @@ class MyApp extends StatelessWidget {
               path: '/',
               builder: (context, state) => const HomeScreen(),
             ),
+            GoRoute(
+              path: '/shopping-list',
+              builder: (context, state) => const ShoppingListScreen(),
+            ),
+            GoRoute(
+              path: '/history',
+              builder: (context, state) => const HistoryScreen(),
+            ),
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const MyKitchenScreen(),
+            ),
             // 他のルートもここに追加予定
           ],
         ),
@@ -55,8 +73,25 @@ class MyApp extends StatelessWidget {
       ],
     );
 
-    return ChangeNotifierProvider(
-      create: (_) => RecipeProvider(apiService),
+    return MultiProvider( // Changed to MultiProvider
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => RecipeProvider(
+            ApiService(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ShoppingListProvider(
+            LocalStorageService(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => HistoryProvider(
+            LocalStorageService(),
+            ApiService(),
+          ),
+        ),
+      ],
       child: MaterialApp.router(
         title: 'hoshipad',
         theme: AppTheme.lightTheme,

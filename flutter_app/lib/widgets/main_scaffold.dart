@@ -16,6 +16,9 @@ class MainScaffold extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _calculateSelectedIndex(context),
         onTap: (int index) => _onItemTapped(index, context),
+        selectedItemColor: const Color(0xFFFF7400),
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -23,27 +26,26 @@ class MainScaffold extends StatelessWidget {
             label: 'ホーム',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_box_outlined),
-            activeIcon: Icon(Icons.add_box),
-            label: 'レシピを書く',
+            icon: Icon(Icons.shopping_cart_outlined),
+            activeIcon: Icon(Icons.shopping_cart),
+            label: '買い物',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Myキッチン',
+            icon: Icon(Icons.history),
+            activeIcon: Icon(Icons.history),
+            label: '履歴',
           ),
         ],
-        type: BottomNavigationBarType.fixed,
       ),
     );
   }
 
   static int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/add')) {
+    if (location.startsWith('/shopping-list')) {
       return 1;
     }
-    if (location.startsWith('/profile')) {
+    if (location.startsWith('/history')) {
       return 2;
     }
     return 0;
@@ -55,11 +57,10 @@ class MainScaffold extends StatelessWidget {
         context.go('/');
         break;
       case 1:
-        context.push('/add');
+        context.go('/shopping-list');
         break;
       case 2:
-        // TODO: Implement Profile Screen
-        // context.go('/profile');
+        context.go('/history');
         break;
     }
   }
