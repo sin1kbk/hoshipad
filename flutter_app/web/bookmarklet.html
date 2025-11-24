@@ -178,11 +178,6 @@
                 📌 hoshipadに保存
             </a>
         </div>
-
-        <div class="note">
-            <strong>🔧 設定:</strong> このブックマークレットのURLは <code>https://www.hoshipad.com</code> に設定されています。ビルド時に環境変数で置き換えられます。
-        </div>
-
         <div class="feature-list">
             <div class="feature">
                 <div class="feature-icon">⚡</div>
@@ -203,13 +198,51 @@
 
         <div class="instructions">
             <h2>📱 インストール方法（iOS Safari）</h2>
+
+            <div class="note" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                <strong>⚠️ 重要:</strong> iPhoneのSafariでは、JavaScriptリンクを直接ブックマークに追加できません。<br>
+                以下の<strong>2段階の方法</strong>でインストールしてください。
+            </div>
+
+            <h3 style="color: #667eea; margin-top: 1.5rem;">ステップ1: ダミーブックマークを作成</h3>
             <ol>
-                <li>上の「📌 hoshipadに保存」ボタンを<strong>長押し</strong></li>
-                <li>メニューから「ブックマークに追加」を選択</li>
-                <li>保存場所を「お気に入り」に設定（ブックマークバーに表示されます）</li>
+                <li>Safariで<strong>任意のページ</strong>（例：https://www.google.com）を開く</li>
+                <li>画面下部の<strong>共有ボタン</strong>（□に↑のアイコン）をタップ</li>
+                <li>「ブックマークを追加」を選択</li>
+                <li>名前を「<strong>hoshipadに保存</strong>」に変更</li>
+                <li>保存場所を「<strong>お気に入り</strong>」に設定</li>
                 <li>「保存」をタップ</li>
+            </ol>
+
+            <h3 style="color: #667eea; margin-top: 1.5rem;">ステップ2: ブックマークを編集</h3>
+            <ol>
+                <li>Safariの<strong>ブックマークアイコン</strong>（本のマーク）をタップ</li>
+                <li>「お気に入り」をタップ</li>
+                <li>「<strong>編集</strong>」をタップ</li>
+                <li>先ほど作成した「<strong>hoshipadに保存</strong>」をタップ</li>
+                <li>URLの欄を<strong>すべて削除</strong></li>
+                <li>下のコードボックスから<strong>JavaScriptコードをコピー</strong></li>
+                <li>URLの欄に<strong>ペースト</strong></li>
+                <li>「完了」→「完了」をタップ</li>
                 <li>完了！🎉</li>
             </ol>
+
+            <div class="code-box" style="margin: 1.5rem 0;">
+                <div style="background: #2d3748; color: white; padding: 12px; border-radius: 8px 8px 0 0; font-weight: bold;">
+                    📋 コピーしてください（タップして全選択→コピー）
+                </div>
+                <textarea id="bookmarkletCode" readonly onclick="this.select()" style="width: 100%; min-height: 150px; padding: 12px; font-family: monospace; font-size: 12px; border: 2px solid #2d3748; border-radius: 0 0 8px 8px; resize: vertical; word-break: break-all;">javascript:(function(){const url=window.location.href;const title=document.title;const ogImage=document.querySelector('meta[property="og:image"]');const imageUrl=ogImage?ogImage.getAttribute('content'):'';const ingredients=[];const ingredientElements=document.querySelectorAll('#ingredients_list .ingredient_row, .ingredient-list li');ingredientElements.forEach(el=>{const nameEl=el.querySelector('.ingredient_name, .name');const amountEl=el.querySelector('.ingredient_quantity, .amount');if(nameEl&&amountEl){ingredients.push({name:nameEl.innerText.trim(),amount:amountEl.innerText.trim()});}else{const text=el.innerText.trim();const parts=text.split(/\s+|　+/);if(parts.length>=2){ingredients.push({name:parts[0],amount:parts.slice(1).join(' ')})}}});const params=new URLSearchParams({url:url,title:title});if(imageUrl)params.append('image',imageUrl);if(ingredients.length>0)params.append('ingredients',JSON.stringify(ingredients));window.open('https://www.hoshipad.com/add?'+params.toString(),'_blank');})();</textarea>
+                <button onclick="copyCode()" style="width: 100%; margin-top: 8px; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                    📋 コードをコピー
+                </button>
+                <div id="copyMessage" style="text-align: center; margin-top: 8px; color: #28a745; font-weight: bold; opacity: 0; transition: opacity 0.3s;">
+                    ✓ コピーしました！
+                </div>
+            </div>
+
+            <div class="note" style="margin-top: 1rem;">
+                <strong>💡 ヒント:</strong> コードは必ず <code>javascript:</code> で始まっていることを確認してください。
+            </div>
 
             <h2>💻 インストール方法（デスクトップ Safari/Chrome）</h2>
             <ol>
@@ -252,5 +285,32 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function copyCode() {
+            const codeTextarea = document.getElementById('bookmarkletCode');
+            const copyMessage = document.getElementById('copyMessage');
+
+            // テキストエリアを選択
+            codeTextarea.select();
+            codeTextarea.setSelectionRange(0, 99999); // モバイル対応
+
+            try {
+                // クリップボードにコピー
+                document.execCommand('copy');
+
+                // 成功メッセージを表示
+                copyMessage.style.opacity = '1';
+                setTimeout(() => {
+                    copyMessage.style.opacity = '0';
+                }, 2000);
+            } catch (err) {
+                alert('コピーに失敗しました。手動でコードを選択してコピーしてください。');
+            }
+
+            // 選択を解除
+            window.getSelection().removeAllRanges();
+        }
+    </script>
 </body>
 </html>
