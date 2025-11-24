@@ -15,6 +15,174 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
+Ingredient _$IngredientFromJson(Map<String, dynamic> json) {
+  return _Ingredient.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Ingredient {
+  String get name => throw _privateConstructorUsedError;
+  String get amount => throw _privateConstructorUsedError;
+
+  /// Serializes this Ingredient to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Ingredient
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $IngredientCopyWith<Ingredient> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $IngredientCopyWith<$Res> {
+  factory $IngredientCopyWith(
+    Ingredient value,
+    $Res Function(Ingredient) then,
+  ) = _$IngredientCopyWithImpl<$Res, Ingredient>;
+  @useResult
+  $Res call({String name, String amount});
+}
+
+/// @nodoc
+class _$IngredientCopyWithImpl<$Res, $Val extends Ingredient>
+    implements $IngredientCopyWith<$Res> {
+  _$IngredientCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of Ingredient
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? name = null, Object? amount = null}) {
+    return _then(
+      _value.copyWith(
+            name: null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                      as String,
+            amount: null == amount
+                ? _value.amount
+                : amount // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$IngredientImplCopyWith<$Res>
+    implements $IngredientCopyWith<$Res> {
+  factory _$$IngredientImplCopyWith(
+    _$IngredientImpl value,
+    $Res Function(_$IngredientImpl) then,
+  ) = __$$IngredientImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String name, String amount});
+}
+
+/// @nodoc
+class __$$IngredientImplCopyWithImpl<$Res>
+    extends _$IngredientCopyWithImpl<$Res, _$IngredientImpl>
+    implements _$$IngredientImplCopyWith<$Res> {
+  __$$IngredientImplCopyWithImpl(
+    _$IngredientImpl _value,
+    $Res Function(_$IngredientImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of Ingredient
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? name = null, Object? amount = null}) {
+    return _then(
+      _$IngredientImpl(
+        name: null == name
+            ? _value.name
+            : name // ignore: cast_nullable_to_non_nullable
+                  as String,
+        amount: null == amount
+            ? _value.amount
+            : amount // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$IngredientImpl implements _Ingredient {
+  const _$IngredientImpl({required this.name, required this.amount});
+
+  factory _$IngredientImpl.fromJson(Map<String, dynamic> json) =>
+      _$$IngredientImplFromJson(json);
+
+  @override
+  final String name;
+  @override
+  final String amount;
+
+  @override
+  String toString() {
+    return 'Ingredient(name: $name, amount: $amount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$IngredientImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.amount, amount) || other.amount == amount));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, name, amount);
+
+  /// Create a copy of Ingredient
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$IngredientImplCopyWith<_$IngredientImpl> get copyWith =>
+      __$$IngredientImplCopyWithImpl<_$IngredientImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$IngredientImplToJson(this);
+  }
+}
+
+abstract class _Ingredient implements Ingredient {
+  const factory _Ingredient({
+    required final String name,
+    required final String amount,
+  }) = _$IngredientImpl;
+
+  factory _Ingredient.fromJson(Map<String, dynamic> json) =
+      _$IngredientImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  String get amount;
+
+  /// Create a copy of Ingredient
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$IngredientImplCopyWith<_$IngredientImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Recipe _$RecipeFromJson(Map<String, dynamic> json) {
   return _Recipe.fromJson(json);
 }
@@ -29,6 +197,9 @@ mixin _$Recipe {
   String? get notes => throw _privateConstructorUsedError;
   RecipeSource get source => throw _privateConstructorUsedError;
   RecipeCategory get category => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
+  String? get userId => throw _privateConstructorUsedError;
+  List<Ingredient>? get ingredients => throw _privateConstructorUsedError;
 
   /// Serializes this Recipe to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,6 +223,8 @@ abstract class $RecipeCopyWith<$Res> {
     String? notes,
     RecipeSource source,
     RecipeCategory category,
+    @JsonKey(name: 'user_id') String? userId,
+    List<Ingredient>? ingredients,
   });
 }
 
@@ -77,6 +250,8 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
     Object? notes = freezed,
     Object? source = null,
     Object? category = null,
+    Object? userId = freezed,
+    Object? ingredients = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -108,6 +283,14 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
                 ? _value.category
                 : category // ignore: cast_nullable_to_non_nullable
                       as RecipeCategory,
+            userId: freezed == userId
+                ? _value.userId
+                : userId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            ingredients: freezed == ingredients
+                ? _value.ingredients
+                : ingredients // ignore: cast_nullable_to_non_nullable
+                      as List<Ingredient>?,
           )
           as $Val,
     );
@@ -130,6 +313,8 @@ abstract class _$$RecipeImplCopyWith<$Res> implements $RecipeCopyWith<$Res> {
     String? notes,
     RecipeSource source,
     RecipeCategory category,
+    @JsonKey(name: 'user_id') String? userId,
+    List<Ingredient>? ingredients,
   });
 }
 
@@ -154,6 +339,8 @@ class __$$RecipeImplCopyWithImpl<$Res>
     Object? notes = freezed,
     Object? source = null,
     Object? category = null,
+    Object? userId = freezed,
+    Object? ingredients = freezed,
   }) {
     return _then(
       _$RecipeImpl(
@@ -185,6 +372,14 @@ class __$$RecipeImplCopyWithImpl<$Res>
             ? _value.category
             : category // ignore: cast_nullable_to_non_nullable
                   as RecipeCategory,
+        userId: freezed == userId
+            ? _value.userId
+            : userId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        ingredients: freezed == ingredients
+            ? _value._ingredients
+            : ingredients // ignore: cast_nullable_to_non_nullable
+                  as List<Ingredient>?,
       ),
     );
   }
@@ -201,7 +396,9 @@ class _$RecipeImpl implements _Recipe {
     this.notes,
     required this.source,
     required this.category,
-  });
+    @JsonKey(name: 'user_id') this.userId,
+    final List<Ingredient>? ingredients,
+  }) : _ingredients = ingredients;
 
   factory _$RecipeImpl.fromJson(Map<String, dynamic> json) =>
       _$$RecipeImplFromJson(json);
@@ -221,10 +418,22 @@ class _$RecipeImpl implements _Recipe {
   final RecipeSource source;
   @override
   final RecipeCategory category;
+  @override
+  @JsonKey(name: 'user_id')
+  final String? userId;
+  final List<Ingredient>? _ingredients;
+  @override
+  List<Ingredient>? get ingredients {
+    final value = _ingredients;
+    if (value == null) return null;
+    if (_ingredients is EqualUnmodifiableListView) return _ingredients;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'Recipe(id: $id, title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, category: $category)';
+    return 'Recipe(id: $id, title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, category: $category, userId: $userId, ingredients: $ingredients)';
   }
 
   @override
@@ -240,7 +449,12 @@ class _$RecipeImpl implements _Recipe {
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.source, source) || other.source == source) &&
             (identical(other.category, category) ||
-                other.category == category));
+                other.category == category) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            const DeepCollectionEquality().equals(
+              other._ingredients,
+              _ingredients,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -254,6 +468,8 @@ class _$RecipeImpl implements _Recipe {
     notes,
     source,
     category,
+    userId,
+    const DeepCollectionEquality().hash(_ingredients),
   );
 
   /// Create a copy of Recipe
@@ -279,6 +495,8 @@ abstract class _Recipe implements Recipe {
     final String? notes,
     required final RecipeSource source,
     required final RecipeCategory category,
+    @JsonKey(name: 'user_id') final String? userId,
+    final List<Ingredient>? ingredients,
   }) = _$RecipeImpl;
 
   factory _Recipe.fromJson(Map<String, dynamic> json) = _$RecipeImpl.fromJson;
@@ -298,6 +516,11 @@ abstract class _Recipe implements Recipe {
   RecipeSource get source;
   @override
   RecipeCategory get category;
+  @override
+  @JsonKey(name: 'user_id')
+  String? get userId;
+  @override
+  List<Ingredient>? get ingredients;
 
   /// Create a copy of Recipe
   /// with the given fields replaced by the non-null parameter values.
@@ -320,6 +543,9 @@ mixin _$InsertRecipe {
   String? get notes => throw _privateConstructorUsedError;
   RecipeSource get source => throw _privateConstructorUsedError;
   RecipeCategory get category => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
+  String? get userId => throw _privateConstructorUsedError;
+  List<Ingredient>? get ingredients => throw _privateConstructorUsedError;
 
   /// Serializes this InsertRecipe to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -345,6 +571,8 @@ abstract class $InsertRecipeCopyWith<$Res> {
     String? notes,
     RecipeSource source,
     RecipeCategory category,
+    @JsonKey(name: 'user_id') String? userId,
+    List<Ingredient>? ingredients,
   });
 }
 
@@ -369,6 +597,8 @@ class _$InsertRecipeCopyWithImpl<$Res, $Val extends InsertRecipe>
     Object? notes = freezed,
     Object? source = null,
     Object? category = null,
+    Object? userId = freezed,
+    Object? ingredients = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -396,6 +626,14 @@ class _$InsertRecipeCopyWithImpl<$Res, $Val extends InsertRecipe>
                 ? _value.category
                 : category // ignore: cast_nullable_to_non_nullable
                       as RecipeCategory,
+            userId: freezed == userId
+                ? _value.userId
+                : userId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            ingredients: freezed == ingredients
+                ? _value.ingredients
+                : ingredients // ignore: cast_nullable_to_non_nullable
+                      as List<Ingredient>?,
           )
           as $Val,
     );
@@ -418,6 +656,8 @@ abstract class _$$InsertRecipeImplCopyWith<$Res>
     String? notes,
     RecipeSource source,
     RecipeCategory category,
+    @JsonKey(name: 'user_id') String? userId,
+    List<Ingredient>? ingredients,
   });
 }
 
@@ -441,6 +681,8 @@ class __$$InsertRecipeImplCopyWithImpl<$Res>
     Object? notes = freezed,
     Object? source = null,
     Object? category = null,
+    Object? userId = freezed,
+    Object? ingredients = freezed,
   }) {
     return _then(
       _$InsertRecipeImpl(
@@ -468,6 +710,14 @@ class __$$InsertRecipeImplCopyWithImpl<$Res>
             ? _value.category
             : category // ignore: cast_nullable_to_non_nullable
                   as RecipeCategory,
+        userId: freezed == userId
+            ? _value.userId
+            : userId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        ingredients: freezed == ingredients
+            ? _value._ingredients
+            : ingredients // ignore: cast_nullable_to_non_nullable
+                  as List<Ingredient>?,
       ),
     );
   }
@@ -483,7 +733,9 @@ class _$InsertRecipeImpl implements _InsertRecipe {
     this.notes,
     required this.source,
     required this.category,
-  });
+    @JsonKey(name: 'user_id') this.userId,
+    final List<Ingredient>? ingredients,
+  }) : _ingredients = ingredients;
 
   factory _$InsertRecipeImpl.fromJson(Map<String, dynamic> json) =>
       _$$InsertRecipeImplFromJson(json);
@@ -501,10 +753,22 @@ class _$InsertRecipeImpl implements _InsertRecipe {
   final RecipeSource source;
   @override
   final RecipeCategory category;
+  @override
+  @JsonKey(name: 'user_id')
+  final String? userId;
+  final List<Ingredient>? _ingredients;
+  @override
+  List<Ingredient>? get ingredients {
+    final value = _ingredients;
+    if (value == null) return null;
+    if (_ingredients is EqualUnmodifiableListView) return _ingredients;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'InsertRecipe(title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, category: $category)';
+    return 'InsertRecipe(title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, category: $category, userId: $userId, ingredients: $ingredients)';
   }
 
   @override
@@ -519,13 +783,27 @@ class _$InsertRecipeImpl implements _InsertRecipe {
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.source, source) || other.source == source) &&
             (identical(other.category, category) ||
-                other.category == category));
+                other.category == category) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            const DeepCollectionEquality().equals(
+              other._ingredients,
+              _ingredients,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, url, imageUrl, notes, source, category);
+  int get hashCode => Object.hash(
+    runtimeType,
+    title,
+    url,
+    imageUrl,
+    notes,
+    source,
+    category,
+    userId,
+    const DeepCollectionEquality().hash(_ingredients),
+  );
 
   /// Create a copy of InsertRecipe
   /// with the given fields replaced by the non-null parameter values.
@@ -549,6 +827,8 @@ abstract class _InsertRecipe implements InsertRecipe {
     final String? notes,
     required final RecipeSource source,
     required final RecipeCategory category,
+    @JsonKey(name: 'user_id') final String? userId,
+    final List<Ingredient>? ingredients,
   }) = _$InsertRecipeImpl;
 
   factory _InsertRecipe.fromJson(Map<String, dynamic> json) =
@@ -567,6 +847,11 @@ abstract class _InsertRecipe implements InsertRecipe {
   RecipeSource get source;
   @override
   RecipeCategory get category;
+  @override
+  @JsonKey(name: 'user_id')
+  String? get userId;
+  @override
+  List<Ingredient>? get ingredients;
 
   /// Create a copy of InsertRecipe
   /// with the given fields replaced by the non-null parameter values.

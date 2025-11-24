@@ -6,6 +6,15 @@ part of 'recipe.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$IngredientImpl _$$IngredientImplFromJson(Map<String, dynamic> json) =>
+    _$IngredientImpl(
+      name: json['name'] as String,
+      amount: json['amount'] as String,
+    );
+
+Map<String, dynamic> _$$IngredientImplToJson(_$IngredientImpl instance) =>
+    <String, dynamic>{'name': instance.name, 'amount': instance.amount};
+
 _$RecipeImpl _$$RecipeImplFromJson(Map<String, dynamic> json) => _$RecipeImpl(
   id: (json['id'] as num).toInt(),
   title: json['title'] as String,
@@ -14,6 +23,10 @@ _$RecipeImpl _$$RecipeImplFromJson(Map<String, dynamic> json) => _$RecipeImpl(
   notes: json['notes'] as String?,
   source: $enumDecode(_$RecipeSourceEnumMap, json['source']),
   category: $enumDecode(_$RecipeCategoryEnumMap, json['category']),
+  userId: json['user_id'] as String?,
+  ingredients: (json['ingredients'] as List<dynamic>?)
+      ?.map((e) => Ingredient.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$$RecipeImplToJson(_$RecipeImpl instance) =>
@@ -25,6 +38,8 @@ Map<String, dynamic> _$$RecipeImplToJson(_$RecipeImpl instance) =>
       'notes': instance.notes,
       'source': _$RecipeSourceEnumMap[instance.source]!,
       'category': _$RecipeCategoryEnumMap[instance.category]!,
+      'user_id': instance.userId,
+      'ingredients': instance.ingredients,
     };
 
 const _$RecipeSourceEnumMap = {
@@ -57,6 +72,10 @@ _$InsertRecipeImpl _$$InsertRecipeImplFromJson(Map<String, dynamic> json) =>
       notes: json['notes'] as String?,
       source: $enumDecode(_$RecipeSourceEnumMap, json['source']),
       category: $enumDecode(_$RecipeCategoryEnumMap, json['category']),
+      userId: json['user_id'] as String?,
+      ingredients: (json['ingredients'] as List<dynamic>?)
+          ?.map((e) => Ingredient.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$$InsertRecipeImplToJson(_$InsertRecipeImpl instance) =>
@@ -67,4 +86,6 @@ Map<String, dynamic> _$$InsertRecipeImplToJson(_$InsertRecipeImpl instance) =>
       'notes': instance.notes,
       'source': _$RecipeSourceEnumMap[instance.source]!,
       'category': _$RecipeCategoryEnumMap[instance.category]!,
+      'user_id': instance.userId,
+      'ingredients': instance.ingredients,
     };

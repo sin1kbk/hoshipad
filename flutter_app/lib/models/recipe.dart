@@ -88,6 +88,17 @@ extension RecipeSourceExtension on RecipeSource {
 }
 
 @freezed
+class Ingredient with _$Ingredient {
+  const factory Ingredient({
+    required String name,
+    required String amount,
+  }) = _Ingredient;
+
+  factory Ingredient.fromJson(Map<String, dynamic> json) =>
+      _$IngredientFromJson(json);
+}
+
+@freezed
 class Recipe with _$Recipe {
   const factory Recipe({
     required int id,
@@ -97,6 +108,8 @@ class Recipe with _$Recipe {
     String? notes,
     required RecipeSource source,
     required RecipeCategory category,
+    @JsonKey(name: 'user_id') String? userId,
+    List<Ingredient>? ingredients,
   }) = _Recipe;
 
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
@@ -111,6 +124,8 @@ class InsertRecipe with _$InsertRecipe {
     String? notes,
     required RecipeSource source,
     required RecipeCategory category,
+    @JsonKey(name: 'user_id') String? userId,
+    List<Ingredient>? ingredients,
   }) = _InsertRecipe;
 
   factory InsertRecipe.fromJson(Map<String, dynamic> json) =>

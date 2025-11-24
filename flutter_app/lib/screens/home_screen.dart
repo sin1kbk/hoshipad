@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/recipe_card.dart';
 import '../widgets/hoshipad_logo.dart';
 import 'recipe_detail_screen.dart';
@@ -129,18 +130,32 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Assuming context.push is a GoRouter extension or similar navigation method
-          // If not using GoRouter, replace with Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddRecipeScreen()));
-          // For this example, I'll keep context.push as it implies a navigation setup.
-          // If this causes an error, the user might need to import go_router or use standard Navigator.
-          // For a basic Flutter app without go_router, it would be:
-          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddRecipeScreen()));
-          // Since the original code doesn't show go_router, I'll assume a placeholder for now.
-          // If this is a standard Flutter app, `context.push('/add')` will cause an error.
-          // I will keep it as is, assuming the user has a custom extension or GoRouter setup.
-          // If not, the user will need to adjust this line.
-          // For a faithful edit, I'll use the provided line.
-          context.push('/add');
+          final authProvider = context.read<AuthProvider>();
+          if (authProvider.isAuthenticated) {
+            context.push('/add');
+          } else {
+            // 未認証の場合はログイン画面に誘導
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('ログインが必要です'),
+                content: const Text('レシピを追加するにはログインが必要です。'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('キャンセル'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      context.push('/login');
+                    },
+                    child: const Text('ログイン'),
+                  ),
+                ],
+              ),
+            );
+          }
         },
         backgroundColor: const Color(0xFFFF7400),
         child: const Icon(Icons.add, color: Colors.white),

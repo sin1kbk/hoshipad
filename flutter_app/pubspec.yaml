@@ -56,6 +56,12 @@ dependencies:
   uuid: ^4.5.2
   flutter_svg: ^2.2.3
 
+  # HTTP client
+  http: ^1.2.0
+
+  # HTML parsing
+  html: ^0.15.4
+
   # Share Extension support
   receive_sharing_intent: ^1.8.1
 

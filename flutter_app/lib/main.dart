@@ -8,15 +8,21 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'config/supabase_config.dart';
 import 'theme/app_theme.dart';
 import 'services/api_service.dart';
+import 'services/auth_service.dart';
 import 'providers/recipe_provider.dart';
 import 'providers/shopping_list_provider.dart';
 import 'providers/history_provider.dart';
+import 'providers/auth_provider.dart';
 import 'services/local_storage_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_recipe_screen.dart';
 import 'screens/shopping_list_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/my_kitchen_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/auth/reset_password_screen.dart';
+import 'screens/auth/profile_screen.dart';
 import 'widgets/main_scaffold.dart';
 
 Future<void> main() async {
@@ -106,6 +112,27 @@ class _MyAppState extends State<MyApp> {
             );
           },
         ),
+        // 認証関連のルート
+        GoRoute(
+          path: '/login',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/signup',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => const SignupScreen(),
+        ),
+        GoRoute(
+          path: '/reset-password',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => const ResetPasswordScreen(),
+        ),
+        GoRoute(
+          path: '/profile-edit',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => const ProfileScreen(),
+        ),
       ],
     );
   }
@@ -148,8 +175,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider( // Changed to MultiProvider
+    return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(
+            AuthService(),
+          ),
+        ),
         ChangeNotifierProvider(
           create: (context) => RecipeProvider(
             ApiService(),

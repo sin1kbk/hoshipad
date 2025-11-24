@@ -16,6 +16,17 @@ class ApiService {
     return (response as List).map((json) => Recipe.fromJson(json)).toList();
   }
 
+  /// ユーザーのレシピのみを取得
+  Future<List<Recipe>> getUserRecipes(String userId) async {
+    final response = await _supabase
+        .from('recipes')
+        .select()
+        .eq('user_id', userId)
+        .order('created_at', ascending: false);
+
+    return (response as List).map((json) => Recipe.fromJson(json)).toList();
+  }
+
   Future<List<Recipe>> searchRecipes({
     String? query,
     RecipeSource? source,
@@ -47,9 +58,15 @@ class ApiService {
   }
 
   Future<Recipe> createRecipe(InsertRecipe recipe) async {
+    // 現在のユーザーIDを自動的に設定
+    final currentUser = _supabase.auth.currentUser;
+    final recipeWithUserId = recipe.copyWith(
+      userId: currentUser?.id,
+    );
+
     final response = await _supabase
         .from('recipes')
-        .insert(recipe.toJson())
+        .insert(recipeWithUserId.toJson())
         .select()
         .single();
 

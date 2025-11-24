@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
+import '../providers/auth_provider.dart';
+import '../services/cookpad_scraper_service.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   final Recipe? recipe;
@@ -26,9 +28,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final _urlController = TextEditingController();
   final _imageUrlController = TextEditingController();
   final _notesController = TextEditingController();
+  final _scraperService = CookpadScraperService();
 
   RecipeSource _selectedSource = RecipeSource.youtube;
   RecipeCategory _selectedCategory = RecipeCategory.meat;
+  List<Ingredient> _ingredients = [];
+  bool _isLoadingMetadata = false;
 
   @override
   void initState() {
@@ -38,6 +43,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     if (widget.sharedUrl != null) {
       _urlController.text = widget.sharedUrl!;
       debugPrint('Shared URL set to form: ${widget.sharedUrl}');
+
+      // CookpadのURLの場合は自動的にスクレイピング
+      if (widget.sharedUrl!.contains('cookpad.com')) {
+        _selectedSource = RecipeSource.cookpad;
+        _autoFetchRecipeMetadata(widget.sharedUrl!);
+      }
     }
 
     // 事前入力されたタイトルがある場合は自動設定
@@ -57,6 +68,64 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       }
       _selectedSource = recipe.source;
       _selectedCategory = recipe.category;
+      _ingredients = recipe.ingredients ?? [];
+    }
+  }
+
+  /// Cookpadから自動的にレシピメタデータを取得
+  Future<void> _autoFetchRecipeMetadata(String url) async {
+    setState(() {
+      _isLoadingMetadata = true;
+    });
+
+    try {
+      final metadata = await _scraperService.scrapeRecipe(url);
+
+      if (metadata != null && mounted) {
+        setState(() {
+          // タイトルが空の場合のみ自動入力
+          if (_titleController.text.isEmpty) {
+            _titleController.text = metadata.title;
+          }
+          _imageUrlController.text = metadata.imageUrl;
+          _ingredients = metadata.ingredients;
+          if (metadata.suggestedCategory != null) {
+            _selectedCategory = metadata.suggestedCategory!;
+          }
+          _isLoadingMetadata = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('レシピ情報を自動取得しました!'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else if (mounted) {
+        setState(() {
+          _isLoadingMetadata = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('レシピ情報の取得に失敗しました'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMetadata = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('エラーが発生しました: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -71,6 +140,89 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final isAuthenticated = authProvider.isAuthenticated;
+
+    // 未認証の場合はログインを促す
+    if (!isAuthenticated) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('レシピを追加'),
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.lock_outline,
+                  size: 80,
+                  color: Colors.grey.shade300,
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'ログインが必要です',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'レシピを追加・編集するには\nログインが必要です',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () {
+                    context.push('/login');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 48,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'ログイン',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    context.push('/signup');
+                  },
+                  child: const Text(
+                    'アカウントを作成',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 認証済みの場合は通常のフォームを表示
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.recipe != null ? 'レシピを編集' : 'レシピを書く'),
@@ -79,7 +231,17 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
-          TextButton(
+          if (_isLoadingMetadata)
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            TextButton(
             onPressed: _saveRecipe,
             child: const Text(
               '保存',
@@ -226,6 +388,36 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               ),
               const SizedBox(height: 24),
 
+              // 材料リスト
+              if (_ingredients.isNotEmpty) ...[
+                _buildSectionLabel('材料 (${_ingredients.length}品目)'),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _ingredients.length,
+                    separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey[300]),
+                    itemBuilder: (context, index) {
+                      final ingredient = _ingredients[index];
+                      return ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.circle, size: 8),
+                        title: Text(ingredient.name),
+                        trailing: Text(
+                          ingredient.amount,
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+
               _buildSectionLabel('メモ'),
               TextFormField(
                 controller: _notesController,
@@ -268,6 +460,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       notes: _notesController.text.isEmpty ? null : _notesController.text,
       source: _selectedSource,
       category: _selectedCategory,
+      ingredients: _ingredients.isEmpty ? null : _ingredients,
     );
 
     try {
