@@ -104,11 +104,14 @@ class _MyAppState extends State<MyApp> {
             debugPrint('Query params: ${state.uri.queryParameters}');
             final sharedUrl = state.uri.queryParameters['url'];
             final sharedTitle = state.uri.queryParameters['title'];
+            final sharedImageUrl = state.uri.queryParameters['image'];
             debugPrint('Shared URL: $sharedUrl');
             debugPrint('Shared Title: $sharedTitle');
+            debugPrint('Shared Image URL: $sharedImageUrl');
             return AddRecipeScreen(
               sharedUrl: sharedUrl,
               prefilledTitle: sharedTitle,
+              prefilledImageUrl: sharedImageUrl,
             );
           },
         ),

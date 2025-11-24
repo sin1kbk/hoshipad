@@ -10,12 +10,14 @@ class AddRecipeScreen extends StatefulWidget {
   final Recipe? recipe;
   final String? sharedUrl;
   final String? prefilledTitle;
+  final String? prefilledImageUrl;
 
   const AddRecipeScreen({
     super.key,
     this.recipe,
     this.sharedUrl,
     this.prefilledTitle,
+    this.prefilledImageUrl,
   });
 
   @override
@@ -34,6 +36,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   RecipeCategory _selectedCategory = RecipeCategory.meat;
   List<Ingredient> _ingredients = [];
   bool _isLoadingMetadata = false;
+  bool _hasTriedAutoFetch = false; // 自動取得を一度だけ実行するフラグ
 
   @override
   void initState() {
@@ -43,18 +46,18 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     if (widget.sharedUrl != null) {
       _urlController.text = widget.sharedUrl!;
       debugPrint('Shared URL set to form: ${widget.sharedUrl}');
-
-      // CookpadのURLの場合は自動的にスクレイピング
-      if (widget.sharedUrl!.contains('cookpad.com')) {
-        _selectedSource = RecipeSource.cookpad;
-        _autoFetchRecipeMetadata(widget.sharedUrl!);
-      }
     }
 
     // 事前入力されたタイトルがある場合は自動設定
     if (widget.prefilledTitle != null && widget.prefilledTitle!.isNotEmpty) {
       _titleController.text = widget.prefilledTitle!;
       debugPrint('Prefilled title set to form: ${widget.prefilledTitle}');
+    }
+
+    // 事前入力された画像URLがある場合は自動設定
+    if (widget.prefilledImageUrl != null && widget.prefilledImageUrl!.isNotEmpty) {
+      _imageUrlController.text = widget.prefilledImageUrl!;
+      debugPrint('Prefilled image URL set to form: ${widget.prefilledImageUrl}');
     }
 
     // 編集モードの場合は既存のレシピデータを設定
@@ -69,6 +72,29 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _selectedSource = recipe.source;
       _selectedCategory = recipe.category;
       _ingredients = recipe.ingredients ?? [];
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // 認証状態を確認して、認証済みかつまだ自動取得を実行していない場合に実行
+    final authProvider = context.watch<AuthProvider>();
+    final isAuthenticated = authProvider.isAuthenticated;
+
+    if (isAuthenticated && !_hasTriedAutoFetch && widget.sharedUrl != null) {
+      // CookpadのURLの場合は自動的にスクレイピング
+      if (widget.sharedUrl!.contains('cookpad.com')) {
+        _selectedSource = RecipeSource.cookpad;
+        _hasTriedAutoFetch = true; // フラグを立てて一度だけ実行
+        // 次のフレームで実行して、buildが完了してから実行されるようにする
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _autoFetchRecipeMetadata(widget.sharedUrl!);
+          }
+        });
+      }
     }
   }
 

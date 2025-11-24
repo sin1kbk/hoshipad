@@ -173,7 +173,7 @@
             <p style="color: white; margin-bottom: 1rem; font-size: 1.1rem;">
                 下のボタンを長押しして、ブックマークに追加してください
             </p>
-            <a href="javascript:(function(){const url=window.location.href;const title=document.title;window.open('https://www.hoshipad.com/add?url='+encodeURIComponent(url)+'&title='+encodeURIComponent(title),'_blank');})();"
+            <a href="javascript:(function(){const url=window.location.href;const title=document.title;const ogImage=document.querySelector('meta[property=&quot;og:image&quot;]');const imageUrl=ogImage?ogImage.getAttribute('content'):'';const params=new URLSearchParams({url:url,title:title});if(imageUrl)params.append('image',imageUrl);window.open('https://www.hoshipad.com/add?'+params.toString(),'_blank');})();"
                class="bookmarklet-button">
                 📌 hoshipadに保存
             </a>
