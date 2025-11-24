@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/social_login_button.dart';
 
@@ -54,13 +55,27 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pop();
+      // リダイレクト先を取得（デフォルトはホーム）
+      final state = GoRouterState.of(context);
+      final redirectTo = state.uri.queryParameters['redirect'] ?? '/';
+
+      // URLパラメータを保持
+      final queryParams = Map<String, String>.from(state.uri.queryParameters);
+      queryParams.remove('redirect'); // redirectパラメータは削除
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('アカウントを作成しました'),
           backgroundColor: Colors.green,
         ),
       );
+
+      if (queryParams.isEmpty) {
+        context.go(redirectTo);
+      } else {
+        final uri = Uri.parse(redirectTo).replace(queryParameters: queryParams);
+        context.go(uri.toString());
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -77,13 +92,25 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pop();
+      final state = GoRouterState.of(context);
+      final redirectTo = state.uri.queryParameters['redirect'] ?? '/';
+
+      final queryParams = Map<String, String>.from(state.uri.queryParameters);
+      queryParams.remove('redirect');
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('アカウントを作成しました'),
           backgroundColor: Colors.green,
         ),
       );
+
+      if (queryParams.isEmpty) {
+        context.go(redirectTo);
+      } else {
+        final uri = Uri.parse(redirectTo).replace(queryParameters: queryParams);
+        context.go(uri.toString());
+      }
     } else {
       final authProvider = context.read<AuthProvider>();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +359,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     const Text('既にアカウントをお持ちの方は'),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushReplacementNamed('/login');
+                        context.go('/login');
                       },
                       child: const Text(
                         'ログイン',

@@ -133,22 +133,23 @@ class _HomeScreenState extends State<HomeScreen> {
           final authProvider = context.read<AuthProvider>();
           if (authProvider.isAuthenticated) {
             context.push('/add');
-          } else {
+           } else {
             // 未認証の場合はログイン画面に誘導
             showDialog(
               context: context,
-              builder: (context) => AlertDialog(
+              builder: (dialogContext) => AlertDialog(
                 title: const Text('ログインが必要です'),
                 content: const Text('レシピを追加するにはログインが必要です。'),
                 actions: [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
                     child: const Text('キャンセル'),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
-                      context.push('/login');
+                      Navigator.of(dialogContext).pop();
+                      // /addへのリダイレクトパラメータを追加
+                      context.push('/login?redirect=/add');
                     },
                     child: const Text('ログイン'),
                   ),

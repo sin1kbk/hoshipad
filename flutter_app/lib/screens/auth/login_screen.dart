@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/social_login_button.dart';
 
@@ -37,7 +38,20 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pop();
+      // リダイレクト先を取得（デフォルトはホーム）
+      final state = GoRouterState.of(context);
+      final redirectTo = state.uri.queryParameters['redirect'] ?? '/';
+
+      // URLパラメータを保持
+      final queryParams = Map<String, String>.from(state.uri.queryParameters);
+      queryParams.remove('redirect'); // redirectパラメータは削除
+
+      if (queryParams.isEmpty) {
+        context.go(redirectTo);
+      } else {
+        final uri = Uri.parse(redirectTo).replace(queryParameters: queryParams);
+        context.go(uri.toString());
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -54,7 +68,19 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pop();
+      // リダイレクト先を取得
+      final state = GoRouterState.of(context);
+      final redirectTo = state.uri.queryParameters['redirect'] ?? '/';
+
+      final queryParams = Map<String, String>.from(state.uri.queryParameters);
+      queryParams.remove('redirect');
+
+      if (queryParams.isEmpty) {
+        context.go(redirectTo);
+      } else {
+        final uri = Uri.parse(redirectTo).replace(queryParameters: queryParams);
+        context.go(uri.toString());
+      }
     } else {
       final authProvider = context.read<AuthProvider>();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -192,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed('/reset-password');
+                      context.push('/reset-password');
                     },
                     child: const Text('パスワードを忘れた場合'),
                   ),
@@ -235,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text('アカウントをお持ちでない方は'),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushReplacementNamed('/signup');
+                        context.go('/signup');
                       },
                       child: const Text(
                         '新規登録',

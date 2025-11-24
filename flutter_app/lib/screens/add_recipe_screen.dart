@@ -184,7 +184,20 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () {
-                    context.push('/login');
+                    // 現在のURLとパラメータを保持
+                    final state = GoRouterState.of(context);
+                    final currentPath = state.uri.path;
+                    final queryParams = state.uri.queryParameters;
+
+                    // redirectパラメータを追加
+                    final loginUri = Uri(
+                      path: '/login',
+                      queryParameters: {
+                        'redirect': currentPath,
+                        ...queryParams,
+                      },
+                    );
+                    context.push(loginUri.toString());
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
@@ -208,7 +221,18 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    context.push('/signup');
+                    final state = GoRouterState.of(context);
+                    final currentPath = state.uri.path;
+                    final queryParams = state.uri.queryParameters;
+
+                    final signupUri = Uri(
+                      path: '/signup',
+                      queryParameters: {
+                        'redirect': currentPath,
+                        ...queryParams,
+                      },
+                    );
+                    context.push(signupUri.toString());
                   },
                   child: const Text(
                     'アカウントを作成',
