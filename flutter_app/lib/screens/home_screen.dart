@@ -3,6 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:url_launcher/url_launcher.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../providers/auth_provider.dart';
@@ -48,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const Spacer(),
+            IconButton(
+              icon: const Text('📌', style: TextStyle(fontSize: 24)),
+              tooltip: 'ブックマークレットを追加',
+              onPressed: () => _showBookmarkletDialog(context),
+            ),
             IconButton(
               icon: const Icon(Icons.notifications_none, color: Colors.grey),
               onPressed: () {},
@@ -266,6 +273,93 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
       }
+    }
+  }
+
+  void _showBookmarkletDialog(BuildContext context) {
+    if (kIsWeb) {
+      // Web環境では専用のブックマークレットページを開く
+      final uri = Uri.parse('/bookmarklet.html');
+      launchUrl(uri, webOnlyWindowName: '_blank');
+    } else {
+      // モバイル環境では説明ダイアログを表示
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              const Text('📌', style: TextStyle(fontSize: 24)),
+              const SizedBox(width: 8),
+              const Text('ブックマークレット'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Safariでレシピページを見ている時に、ブックマークレットから簡単にhoshipadに保存できます！',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'インストール方法',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text('1. Webブラウザでhoshipadを開く'),
+                const SizedBox(height: 4),
+                const Text('2. ブックマークレットページにアクセス'),
+                const SizedBox(height: 4),
+                const Text('3. 「📌 hoshipadに保存」ボタンを長押し'),
+                const SizedBox(height: 4),
+                const Text('4. 「ブックマークに追加」を選択'),
+                const SizedBox(height: 4),
+                const Text('5. 保存先を「お気に入り」に設定'),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFF7400), width: 2),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.info_outline, color: Color(0xFFFF7400)),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'アクセス方法',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFF7400),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text('hoshipad.com/bookmarklet.html'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('閉じる'),
+            ),
+          ],
+        ),
+      );
     }
   }
 }

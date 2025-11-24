@@ -65,6 +65,9 @@ dependencies:
   # Share Extension support
   receive_sharing_intent: ^1.8.1
 
+  # URL launcher
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
