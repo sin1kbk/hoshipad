@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'platform_image.dart';
 import '../models/recipe.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -41,16 +41,19 @@ class RecipeCard extends StatelessWidget {
                 SizedBox(
                   width: 120,
                   height: 120,
-                  child: CachedNetworkImage(
+                  child: PlatformImage(
                     imageUrl: recipe.imageUrl,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey[100],
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[100],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => Container(
                       color: Colors.grey[100],
                       child: const Icon(Icons.broken_image, color: Colors.grey),
                     ),

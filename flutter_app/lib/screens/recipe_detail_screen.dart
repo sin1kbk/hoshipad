@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/platform_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -37,14 +37,17 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
             expandedHeight: 300,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              background: CachedNetworkImage(
+              background: PlatformImage(
                 imageUrl: recipe.imageUrl,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey[100],
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-                errorWidget: (context, url, error) => Container(
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey[100],
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
                   color: Colors.grey[100],
                   child: const Icon(Icons.broken_image, color: Colors.grey),
                 ),

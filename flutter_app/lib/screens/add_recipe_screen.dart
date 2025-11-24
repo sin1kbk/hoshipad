@@ -5,7 +5,7 @@ import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/cookpad_scraper_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import '../widgets/platform_image.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   final Recipe? recipe;
@@ -335,23 +335,28 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: _imageUrlController.text.isNotEmpty
-                    ? CachedNetworkImage(
+                    ? PlatformImage(
                         imageUrl: _imageUrlController.text,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) => Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image, size: 48, color: Colors.grey[400]),
-                            const SizedBox(height: 8),
-                            Text(
-                              '画像の読み込みに失敗しました',
-                              style: TextStyle(color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image, size: 48, color: Colors.grey[400]),
+                              const SizedBox(height: 8),
+                              Text(
+                                '画像の読み込みに失敗しました',
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                            ],
+                          );
+                        },
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
