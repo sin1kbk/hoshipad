@@ -17,9 +17,27 @@ class AppTheme {
         background: backgroundColor,
         brightness: Brightness.light,
       ),
-      textTheme: GoogleFonts.notoSansJpTextTheme().apply(
+      textTheme: ThemeData.light().textTheme.apply(
+        fontFamily: 'Noto Sans JP',
         bodyColor: const Color(0xFF333333),
         displayColor: const Color(0xFF333333),
+      ).copyWith(
+        // フォールバックフォントを設定
+        bodyLarge: const TextStyle(
+          fontFamily: 'Noto Sans JP',
+          fontFamilyFallback: ['Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'sans-serif'],
+          color: Color(0xFF333333),
+        ),
+        bodyMedium: const TextStyle(
+          fontFamily: 'Noto Sans JP',
+          fontFamilyFallback: ['Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'sans-serif'],
+          color: Color(0xFF333333),
+        ),
+        bodySmall: const TextStyle(
+          fontFamily: 'Noto Sans JP',
+          fontFamilyFallback: ['Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'sans-serif'],
+          color: Color(0xFF333333),
+        ),
       ),
       scaffoldBackgroundColor: backgroundColor,
       cardTheme: const CardThemeData(
@@ -31,17 +49,19 @@ class AppTheme {
         color: Colors.white,
         margin: EdgeInsets.zero,
       ),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         elevation: 0,
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF333333),
+        foregroundColor: Color(0xFF333333),
         centerTitle: true,
-        titleTextStyle: GoogleFonts.notoSansJp(
+        titleTextStyle: TextStyle(
+          fontFamily: 'Noto Sans JP',
+          fontFamilyFallback: ['Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'sans-serif'],
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF333333),
+          color: Color(0xFF333333),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF333333)),
+        iconTheme: IconThemeData(color: Color(0xFF333333)),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,

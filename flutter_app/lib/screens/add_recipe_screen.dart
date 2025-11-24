@@ -5,6 +5,7 @@ import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/cookpad_scraper_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   final Recipe? recipe;
@@ -73,6 +74,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _selectedCategory = recipe.category;
       _ingredients = recipe.ingredients ?? [];
     }
+
+    _imageUrlController.addListener(_onImageUrlChanged);
+  }
+
+  void _onImageUrlChanged() {
+    setState(() {});
   }
 
   @override
@@ -84,16 +91,25 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     final isAuthenticated = authProvider.isAuthenticated;
 
     if (isAuthenticated && !_hasTriedAutoFetch && widget.sharedUrl != null) {
-      // CookpadのURLの場合は自動的にスクレイピング
+      // CookpadのURLの場合
       if (widget.sharedUrl!.contains('cookpad.com')) {
         _selectedSource = RecipeSource.cookpad;
         _hasTriedAutoFetch = true; // フラグを立てて一度だけ実行
-        // 次のフレームで実行して、buildが完了してから実行されるようにする
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _autoFetchRecipeMetadata(widget.sharedUrl!);
-          }
-        });
+
+        // 画像URLが既に設定されている場合（ブックマークレットから渡された場合）は
+        // スクレイピングをスキップ
+        if (widget.prefilledImageUrl != null && widget.prefilledImageUrl!.isNotEmpty) {
+          debugPrint('Image URL already provided, skipping scraping');
+          // カテゴリだけ推定する場合はここで処理
+          // 現在はブックマークレットから全ての情報が渡されているのでスキップ
+        } else {
+          // 画像URLが渡されていない場合のみスクレイピングを実行
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _autoFetchRecipeMetadata(widget.sharedUrl!);
+            }
+          });
+        }
       }
     }
   }
@@ -157,6 +173,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   void dispose() {
+    _imageUrlController.removeListener(_onImageUrlChanged);
     _titleController.dispose();
     _urlController.dispose();
     _imageUrlController.dispose();
@@ -316,17 +333,37 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_a_photo, size: 48, color: Colors.grey[400]),
-                    const SizedBox(height: 8),
-                    Text(
-                      '料理の写真を登録',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+                clipBehavior: Clip.antiAlias,
+                child: _imageUrlController.text.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: _imageUrlController.text,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.broken_image, size: 48, color: Colors.grey[400]),
+                            const SizedBox(height: 8),
+                            Text(
+                              '画像の読み込みに失敗しました',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_a_photo, size: 48, color: Colors.grey[400]),
+                          const SizedBox(height: 8),
+                          Text(
+                            '料理の写真を登録',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
               ),
               const SizedBox(height: 24),
 
@@ -520,7 +557,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('レシピが更新されました！')),
           );
-          context.pop();
+          // スタックがある場合はpop、ない場合はホームにリダイレクト
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/');
+          }
         }
       } else {
         await context.read<RecipeProvider>().createRecipe(recipe);
@@ -528,7 +570,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('レシピが正常に追加されました！')),
           );
-          context.pop();
+          // スタックがある場合はpop、ない場合はホームにリダイレクト
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/');
+          }
         }
       }
     } catch (e) {
