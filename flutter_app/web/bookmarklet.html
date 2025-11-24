@@ -173,14 +173,14 @@
             <p style="color: white; margin-bottom: 1rem; font-size: 1.1rem;">
                 下のボタンを長押しして、ブックマークに追加してください
             </p>
-            <a href="javascript:(function(){const url=window.location.href;const title=document.title;const ogImage=document.querySelector('meta[property=&quot;og:image&quot;]');const imageUrl=ogImage?ogImage.getAttribute('content'):'';const ingredients=[];const ingredientElements=document.querySelectorAll('#ingredients_list .ingredient_row, .ingredient-list li');ingredientElements.forEach(el=>{const nameEl=el.querySelector('.ingredient_name, .name');const amountEl=el.querySelector('.ingredient_quantity, .amount');if(nameEl&&amountEl){ingredients.push({name:nameEl.innerText.trim(),amount:amountEl.innerText.trim()});}else{const text=el.innerText.trim();const parts=text.split(/\s+|　+/);if(parts.length>=2){ingredients.push({name:parts[0],amount:parts.slice(1).join(' ')})}}});const params=new URLSearchParams({url:url,title:title});if(imageUrl)params.append('image',imageUrl);if(ingredients.length>0)params.append('ingredients',JSON.stringify(ingredients));window.open('http://localhost:8080/add?'+params.toString(),'_blank');})();"
+            <a href="javascript:(function(){const url=window.location.href;const title=document.title;const ogImage=document.querySelector('meta[property=&quot;og:image&quot;]');const imageUrl=ogImage?ogImage.getAttribute('content'):'';const ingredients=[];const ingredientElements=document.querySelectorAll('#ingredients_list .ingredient_row, .ingredient-list li');ingredientElements.forEach(el=>{const nameEl=el.querySelector('.ingredient_name, .name');const amountEl=el.querySelector('.ingredient_quantity, .amount');if(nameEl&&amountEl){ingredients.push({name:nameEl.innerText.trim(),amount:amountEl.innerText.trim()});}else{const text=el.innerText.trim();const parts=text.split(/\s+|　+/);if(parts.length>=2){ingredients.push({name:parts[0],amount:parts.slice(1).join(' ')})}}});const params=new URLSearchParams({url:url,title:title});if(imageUrl)params.append('image',imageUrl);if(ingredients.length>0)params.append('ingredients',JSON.stringify(ingredients));window.open('https://www.hoshipad.com/add?'+params.toString(),'_blank');})();"
                class="bookmarklet-button">
                 📌 hoshipadに保存
             </a>
         </div>
 
         <div class="note">
-            <strong>🔧 設定:</strong> このブックマークレットのURLは <code>http://localhost:8080</code> に設定されています。ビルド時に環境変数で置き換えられます。
+            <strong>🔧 設定:</strong> このブックマークレットのURLは <code>https://www.hoshipad.com</code> に設定されています。ビルド時に環境変数で置き換えられます。
         </div>
 
         <div class="feature-list">
@@ -234,7 +234,7 @@
                 <p><strong>↓ ブックマークレット実行 ↓</strong></p>
                 <p><strong>開かれるURL:</strong></p>
                 <div class="demo-url">
-                    http://localhost:8080/add?url=https%3A%2F%2Fcookpad.com%2Frecipe%2F123456&title=%E7%BE%8E%E5%91%B3%E3%81%97%E3%81%84%E8%82%89%E3%81%98%E3%81%8C%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94
+                    https://www.hoshipad.com/add?url=https%3A%2F%2Fcookpad.com%2Frecipe%2F123456&title=%E7%BE%8E%E5%91%B3%E3%81%97%E3%81%84%E8%82%89%E3%81%98%E3%81%8C%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94
                 </div>
             </div>
 
