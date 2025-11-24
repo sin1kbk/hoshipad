@@ -87,6 +87,41 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
+                  if (recipe.ingredients != null && recipe.ingredients!.isNotEmpty) ...[
+                    Text(
+                      '材料',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListView.separated(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: recipe.ingredients!.length,
+                        separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey[300]),
+                        itemBuilder: (context, index) {
+                          final ingredient = recipe.ingredients![index];
+                          return ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.circle, size: 8, color: Colors.orange),
+                            title: Text(ingredient.name),
+                            trailing: Text(
+                              ingredient.amount,
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                   if (recipe.notes != null && recipe.notes!.isNotEmpty) ...[
                     Text(
                       'メモ',

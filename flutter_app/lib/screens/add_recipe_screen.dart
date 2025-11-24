@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ class AddRecipeScreen extends StatefulWidget {
   final String? sharedUrl;
   final String? prefilledTitle;
   final String? prefilledImageUrl;
+  final String? prefilledIngredients;
 
   const AddRecipeScreen({
     super.key,
@@ -19,6 +21,7 @@ class AddRecipeScreen extends StatefulWidget {
     this.sharedUrl,
     this.prefilledTitle,
     this.prefilledImageUrl,
+    this.prefilledIngredients,
   });
 
   @override
@@ -35,33 +38,51 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   RecipeSource _selectedSource = RecipeSource.youtube;
   RecipeCategory _selectedCategory = RecipeCategory.meat;
-  List<Ingredient> _ingredients = [];
+
+  // 材料のコントローラーリスト
+  final List<({TextEditingController name, TextEditingController amount})> _ingredientControllers = [];
+
   bool _isLoadingMetadata = false;
-  bool _hasTriedAutoFetch = false; // 自動取得を一度だけ実行するフラグ
+  bool _hasTriedAutoFetch = false;
 
   @override
   void initState() {
     super.initState();
 
-    // 共有されたURLがある場合は自動設定
     if (widget.sharedUrl != null) {
       _urlController.text = widget.sharedUrl!;
-      debugPrint('Shared URL set to form: ${widget.sharedUrl}');
     }
 
-    // 事前入力されたタイトルがある場合は自動設定
     if (widget.prefilledTitle != null && widget.prefilledTitle!.isNotEmpty) {
       _titleController.text = widget.prefilledTitle!;
-      debugPrint('Prefilled title set to form: ${widget.prefilledTitle}');
     }
 
-    // 事前入力された画像URLがある場合は自動設定
     if (widget.prefilledImageUrl != null && widget.prefilledImageUrl!.isNotEmpty) {
       _imageUrlController.text = widget.prefilledImageUrl!;
-      debugPrint('Prefilled image URL set to form: ${widget.prefilledImageUrl}');
     }
 
-    // 編集モードの場合は既存のレシピデータを設定
+    // 初期材料データの読み込み
+    List<Ingredient> initialIngredients = [];
+    if (widget.prefilledIngredients != null && widget.prefilledIngredients!.isNotEmpty) {
+      try {
+        final List<dynamic> jsonList = jsonDecode(widget.prefilledIngredients!);
+        initialIngredients = jsonList.map((json) => Ingredient.fromJson(json)).toList();
+      } catch (e) {
+        debugPrint('Failed to parse prefilled ingredients: $e');
+      }
+    } else if (widget.recipe != null) {
+      initialIngredients = widget.recipe!.ingredients ?? [];
+    }
+
+    // コントローラーの初期化
+    for (var ingredient in initialIngredients) {
+      _addIngredientRow(ingredient.name, ingredient.amount);
+    }
+    // 材料が空の場合は1行追加しておく
+    if (_ingredientControllers.isEmpty) {
+      _addIngredientRow();
+    }
+
     if (widget.recipe != null) {
       final recipe = widget.recipe!;
       _titleController.text = recipe.title;
@@ -72,10 +93,23 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       }
       _selectedSource = recipe.source;
       _selectedCategory = recipe.category;
-      _ingredients = recipe.ingredients ?? [];
     }
 
     _imageUrlController.addListener(_onImageUrlChanged);
+  }
+
+  void _addIngredientRow([String name = '', String amount = '']) {
+    _ingredientControllers.add((
+      name: TextEditingController(text: name),
+      amount: TextEditingController(text: amount),
+    ));
+  }
+
+  void _removeIngredientRow(int index) {
+    final controllers = _ingredientControllers.removeAt(index);
+    controllers.name.dispose();
+    controllers.amount.dispose();
+    setState(() {});
   }
 
   void _onImageUrlChanged() {
@@ -86,24 +120,19 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // 認証状態を確認して、認証済みかつまだ自動取得を実行していない場合に実行
     final authProvider = context.watch<AuthProvider>();
     final isAuthenticated = authProvider.isAuthenticated;
 
     if (isAuthenticated && !_hasTriedAutoFetch && widget.sharedUrl != null) {
-      // CookpadのURLの場合
       if (widget.sharedUrl!.contains('cookpad.com')) {
         _selectedSource = RecipeSource.cookpad;
-        _hasTriedAutoFetch = true; // フラグを立てて一度だけ実行
+        _hasTriedAutoFetch = true;
 
-        // 画像URLが既に設定されている場合（ブックマークレットから渡された場合）は
-        // スクレイピングをスキップ
         if (widget.prefilledImageUrl != null && widget.prefilledImageUrl!.isNotEmpty) {
           debugPrint('Image URL already provided, skipping scraping');
-          // カテゴリだけ推定する場合はここで処理
-          // 現在はブックマークレットから全ての情報が渡されているのでスキップ
+        } else if (_ingredientControllers.any((c) => c.name.text.isNotEmpty)) {
+          debugPrint('Ingredients already provided, skipping scraping');
         } else {
-          // 画像URLが渡されていない場合のみスクレイピングを実行
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               _autoFetchRecipeMetadata(widget.sharedUrl!);
@@ -114,7 +143,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     }
   }
 
-  /// Cookpadから自動的にレシピメタデータを取得
   Future<void> _autoFetchRecipeMetadata(String url) async {
     setState(() {
       _isLoadingMetadata = true;
@@ -125,12 +153,25 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
       if (metadata != null && mounted) {
         setState(() {
-          // タイトルが空の場合のみ自動入力
           if (_titleController.text.isEmpty) {
             _titleController.text = metadata.title;
           }
           _imageUrlController.text = metadata.imageUrl;
-          _ingredients = metadata.ingredients;
+
+          // 既存の材料をクリアして新しい材料を追加
+          for (var controller in _ingredientControllers) {
+            controller.name.dispose();
+            controller.amount.dispose();
+          }
+          _ingredientControllers.clear();
+
+          for (var ingredient in metadata.ingredients) {
+            _addIngredientRow(ingredient.name, ingredient.amount);
+          }
+          if (_ingredientControllers.isEmpty) {
+            _addIngredientRow();
+          }
+
           if (metadata.suggestedCategory != null) {
             _selectedCategory = metadata.suggestedCategory!;
           }
@@ -178,6 +219,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     _urlController.dispose();
     _imageUrlController.dispose();
     _notesController.dispose();
+    for (var controller in _ingredientControllers) {
+      controller.name.dispose();
+      controller.amount.dispose();
+    }
     super.dispose();
   }
 
@@ -186,7 +231,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     final authProvider = context.watch<AuthProvider>();
     final isAuthenticated = authProvider.isAuthenticated;
 
-    // 未認証の場合はログインを促す
     if (!isAuthenticated) {
       return Scaffold(
         appBar: AppBar(
@@ -227,12 +271,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () {
-                    // 現在のURLとパラメータを保持
                     final state = GoRouterState.of(context);
                     final currentPath = state.uri.path;
                     final queryParams = state.uri.queryParameters;
 
-                    // redirectパラメータを追加
                     final loginUri = Uri(
                       path: '/login',
                       queryParameters: {
@@ -289,7 +331,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       );
     }
 
-    // 認証済みの場合は通常のフォームを表示
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.recipe != null ? 'レシピを編集' : 'レシピを書く'),
@@ -324,7 +365,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image Upload Placeholder
               Container(
                 height: 200,
                 width: double.infinity,
@@ -480,35 +520,65 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 材料リスト
-              if (_ingredients.isNotEmpty) ...[
-                _buildSectionLabel('材料 (${_ingredients.length}品目)'),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _ingredients.length,
-                    separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey[300]),
-                    itemBuilder: (context, index) {
-                      final ingredient = _ingredients[index];
-                      return ListTile(
-                        dense: true,
-                        leading: const Icon(Icons.circle, size: 8),
-                        title: Text(ingredient.name),
-                        trailing: Text(
-                          ingredient.amount,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      );
+              // 材料リスト編集
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildSectionLabel('材料'),
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _addIngredientRow();
+                      });
                     },
+                    icon: const Icon(Icons.add),
+                    label: const Text('行を追加'),
                   ),
-                ),
-                const SizedBox(height: 24),
-              ],
+                ],
+              ),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _ingredientControllers.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final controllers = _ingredientControllers[index];
+                  return Row(
+                    children: [
+                      const Icon(Icons.drag_handle, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 2,
+                        child: TextFormField(
+                          controller: controllers.name,
+                          decoration: const InputDecoration(
+                            hintText: '材料名',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 1,
+                        child: TextFormField(
+                          controller: controllers.amount,
+                          decoration: const InputDecoration(
+                            hintText: '分量',
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.grey),
+                        onPressed: () => _removeIngredientRow(index),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
 
               _buildSectionLabel('メモ'),
               TextFormField(
@@ -545,6 +615,16 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       return;
     }
 
+    // 材料リストの構築
+    final List<Ingredient> ingredients = [];
+    for (var controller in _ingredientControllers) {
+      final name = controller.name.text.trim();
+      final amount = controller.amount.text.trim();
+      if (name.isNotEmpty) {
+        ingredients.add(Ingredient(name: name, amount: amount));
+      }
+    }
+
     final recipe = InsertRecipe(
       title: _titleController.text,
       url: _urlController.text,
@@ -552,7 +632,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       notes: _notesController.text.isEmpty ? null : _notesController.text,
       source: _selectedSource,
       category: _selectedCategory,
-      ingredients: _ingredients.isEmpty ? null : _ingredients,
+      ingredients: ingredients.isEmpty ? null : ingredients,
     );
 
     try {
@@ -562,7 +642,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('レシピが更新されました！')),
           );
-          // スタックがある場合はpop、ない場合はホームにリダイレクト
           if (context.canPop()) {
             context.pop();
           } else {
@@ -575,7 +654,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('レシピが正常に追加されました！')),
           );
-          // スタックがある場合はpop、ない場合はホームにリダイレクト
           if (context.canPop()) {
             context.pop();
           } else {

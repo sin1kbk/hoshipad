@@ -173,7 +173,7 @@
             <p style="color: white; margin-bottom: 1rem; font-size: 1.1rem;">
                 下のボタンを長押しして、ブックマークに追加してください
             </p>
-            <a href="javascript:(function(){const url=window.location.href;const title=document.title;const ogImage=document.querySelector('meta[property=&quot;og:image&quot;]');const imageUrl=ogImage?ogImage.getAttribute('content'):'';const params=new URLSearchParams({url:url,title:title});if(imageUrl)params.append('image',imageUrl);window.open('http://localhost:8080/add?'+params.toString(),'_blank');})();"
+            <a href="javascript:(function(){const url=window.location.href;const title=document.title;const ogImage=document.querySelector('meta[property=&quot;og:image&quot;]');const imageUrl=ogImage?ogImage.getAttribute('content'):'';const ingredients=[];const ingredientElements=document.querySelectorAll('#ingredients_list .ingredient_row, .ingredient-list li');ingredientElements.forEach(el=>{const nameEl=el.querySelector('.ingredient_name, .name');const amountEl=el.querySelector('.ingredient_quantity, .amount');if(nameEl&&amountEl){ingredients.push({name:nameEl.innerText.trim(),amount:amountEl.innerText.trim()});}else{const text=el.innerText.trim();const parts=text.split(/\s+|　+/);if(parts.length>=2){ingredients.push({name:parts[0],amount:parts.slice(1).join(' ')})}}});const params=new URLSearchParams({url:url,title:title});if(imageUrl)params.append('image',imageUrl);if(ingredients.length>0)params.append('ingredients',JSON.stringify(ingredients));window.open('http://localhost:8080/add?'+params.toString(),'_blank');})();"
                class="bookmarklet-button">
                 📌 hoshipadに保存
             </a>

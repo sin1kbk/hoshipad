@@ -29,10 +29,31 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
+  <!-- Google Fonts - 日本語フォント (プリロード) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- フォントスタイルシートのプリロード -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
   <title>hoshipad - お気に入りのレシピを保存</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- フォールバックフォントのスタイル -->
+  <style>
+    body {
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    }
+  </style>
 </head>
 <body>
+  <!-- フォント読み込み強制用の隠し要素 -->
+  <div style="font-family: 'Noto Sans JP'; opacity: 0; position: absolute; pointer-events: none;">
+    日本語フォント読み込み中...
+  </div>
+  <script>
+    window.flutterWebRenderer = "html";
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
