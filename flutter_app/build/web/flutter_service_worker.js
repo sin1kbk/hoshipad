@@ -3,10 +3,12 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"flutter_bootstrap.js": "44b60b73d9ce60050e33513f984f98d3",
+const RESOURCES = {"favicon-16x16.png": "1ad6a3fcd47cba3aa1ba0ed0110ad11b",
+"flutter_bootstrap.js": "b64f9c148bb1ac79270ee8cc1a7f8cdb",
 "version.json": "26da6f549d9f71d454acb87c68badcc2",
-"index.html": "4827ca6a4e2399ff523cac392552f8c5",
-"/": "4827ca6a4e2399ff523cac392552f8c5",
+"favicon.ico": "8abcf3fb67bc3c44156352eda6ed8a73",
+"index.html": "8877e28bd17148d2895f93380b430ba4",
+"/": "8877e28bd17148d2895f93380b430ba4",
 "bookmarklet.html": "b65196559a9fe8688b0323619e4f5384",
 "main.dart.js": "9058275f8e544d35cfb6017f58a61370",
 "flutter.js": "24bc71911b75b5f8135c949e27a2984e",
@@ -26,6 +28,7 @@ const RESOURCES = {"flutter_bootstrap.js": "44b60b73d9ce60050e33513f984f98d3",
 "assets/fonts/MaterialIcons-Regular.otf": "f59fb46e7daf17aeda76dcf4ebd71446",
 "assets/assets/icons/crossed_cutlery.svg": "5f5ad4f9c7921aa1bbd6572ab88f063d",
 "assets/assets/icons/meat.png": "892644c7074f2e1a23bedf78fe619638",
+"favicon-32x32.png": "18e080decf84da62e3b7496f3be2e061",
 "canvaskit/skwasm.js": "8060d46e9a4901ca9991edd3a26be4f0",
 "canvaskit/skwasm_heavy.js": "740d43a6b8240ef9e23eed8c48840da4",
 "canvaskit/skwasm.js.symbols": "3a4aadf4e8141f284bd524976b1d6bdc",
