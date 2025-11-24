@@ -107,7 +107,7 @@ class Recipe with _$Recipe {
     @JsonKey(name: 'image_url') required String imageUrl,
     String? notes,
     required RecipeSource source,
-    required RecipeCategory category,
+    List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
   }) = _Recipe;
@@ -123,7 +123,7 @@ class InsertRecipe with _$InsertRecipe {
     @JsonKey(name: 'image_url') required String imageUrl,
     String? notes,
     required RecipeSource source,
-    required RecipeCategory category,
+    List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
   }) = _InsertRecipe;

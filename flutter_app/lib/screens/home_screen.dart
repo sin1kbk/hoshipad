@@ -76,24 +76,26 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: Consumer<RecipeProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
+      body: Consumer2<RecipeProvider, AuthProvider>(
+        builder: (context, recipeProvider, authProvider, child) {
+          if (recipeProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final currentUserId = authProvider.currentUser?.id;
+
           return RefreshIndicator(
-            onRefresh: () => provider.loadRecipes(),
+            onRefresh: () => recipeProvider.loadRecipes(),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildCategoryList(context, provider),
+                  _buildCategoryList(context, recipeProvider),
                   const SizedBox(height: 24),
                   _buildSectionTitle(context, '保存されたレシピ'),
                   const SizedBox(height: 16),
-                  if (provider.recipes.isEmpty)
+                  if (recipeProvider.recipes.isEmpty)
                     const Center(
                       child: Padding(
                         padding: EdgeInsets.all(32.0),
@@ -104,10 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: provider.recipes.length,
+                      itemCount: recipeProvider.recipes.length,
                       separatorBuilder: (context, index) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
-                        final recipe = provider.recipes[index];
+                        final recipe = recipeProvider.recipes[index];
+                        final isCreator = currentUserId != null && recipe.userId == currentUserId;
                         return RecipeCard(
                           recipe: recipe,
                           onTap: () {
@@ -118,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
-                          onDelete: () => _deleteRecipe(context, recipe),
+                          onDelete: isCreator ? () => _deleteRecipe(context, recipe) : null,
                         );
                       },
                     ),

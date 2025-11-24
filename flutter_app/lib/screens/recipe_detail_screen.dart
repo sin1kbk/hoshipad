@@ -78,12 +78,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      _buildTag(context, recipe.category.displayName, Icons.category),
-                      const SizedBox(width: 8),
                       _buildTag(context, recipe.source.displayName, Icons.source),
+                      if (recipe.tags != null && recipe.tags!.isNotEmpty)
+                        ...recipe.tags!.map((tag) => _buildTag(context, tag, Icons.local_offer)),
                     ],
                   ),
                   const SizedBox(height: 24),

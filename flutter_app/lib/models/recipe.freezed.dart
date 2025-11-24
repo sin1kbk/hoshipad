@@ -196,7 +196,7 @@ mixin _$Recipe {
   String get imageUrl => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   RecipeSource get source => throw _privateConstructorUsedError;
-  RecipeCategory get category => throw _privateConstructorUsedError;
+  List<String>? get tags => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   List<Ingredient>? get ingredients => throw _privateConstructorUsedError;
@@ -222,7 +222,7 @@ abstract class $RecipeCopyWith<$Res> {
     @JsonKey(name: 'image_url') String imageUrl,
     String? notes,
     RecipeSource source,
-    RecipeCategory category,
+    List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
   });
@@ -249,7 +249,7 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
     Object? imageUrl = null,
     Object? notes = freezed,
     Object? source = null,
-    Object? category = null,
+    Object? tags = freezed,
     Object? userId = freezed,
     Object? ingredients = freezed,
   }) {
@@ -279,10 +279,10 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
                 ? _value.source
                 : source // ignore: cast_nullable_to_non_nullable
                       as RecipeSource,
-            category: null == category
-                ? _value.category
-                : category // ignore: cast_nullable_to_non_nullable
-                      as RecipeCategory,
+            tags: freezed == tags
+                ? _value.tags
+                : tags // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
             userId: freezed == userId
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
@@ -312,7 +312,7 @@ abstract class _$$RecipeImplCopyWith<$Res> implements $RecipeCopyWith<$Res> {
     @JsonKey(name: 'image_url') String imageUrl,
     String? notes,
     RecipeSource source,
-    RecipeCategory category,
+    List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
   });
@@ -338,7 +338,7 @@ class __$$RecipeImplCopyWithImpl<$Res>
     Object? imageUrl = null,
     Object? notes = freezed,
     Object? source = null,
-    Object? category = null,
+    Object? tags = freezed,
     Object? userId = freezed,
     Object? ingredients = freezed,
   }) {
@@ -368,10 +368,10 @@ class __$$RecipeImplCopyWithImpl<$Res>
             ? _value.source
             : source // ignore: cast_nullable_to_non_nullable
                   as RecipeSource,
-        category: null == category
-            ? _value.category
-            : category // ignore: cast_nullable_to_non_nullable
-                  as RecipeCategory,
+        tags: freezed == tags
+            ? _value._tags
+            : tags // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
         userId: freezed == userId
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
@@ -395,10 +395,11 @@ class _$RecipeImpl implements _Recipe {
     @JsonKey(name: 'image_url') required this.imageUrl,
     this.notes,
     required this.source,
-    required this.category,
+    final List<String>? tags,
     @JsonKey(name: 'user_id') this.userId,
     final List<Ingredient>? ingredients,
-  }) : _ingredients = ingredients;
+  }) : _tags = tags,
+       _ingredients = ingredients;
 
   factory _$RecipeImpl.fromJson(Map<String, dynamic> json) =>
       _$$RecipeImplFromJson(json);
@@ -416,8 +417,16 @@ class _$RecipeImpl implements _Recipe {
   final String? notes;
   @override
   final RecipeSource source;
+  final List<String>? _tags;
   @override
-  final RecipeCategory category;
+  List<String>? get tags {
+    final value = _tags;
+    if (value == null) return null;
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
@@ -433,7 +442,7 @@ class _$RecipeImpl implements _Recipe {
 
   @override
   String toString() {
-    return 'Recipe(id: $id, title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, category: $category, userId: $userId, ingredients: $ingredients)';
+    return 'Recipe(id: $id, title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, tags: $tags, userId: $userId, ingredients: $ingredients)';
   }
 
   @override
@@ -448,8 +457,7 @@ class _$RecipeImpl implements _Recipe {
                 other.imageUrl == imageUrl) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.source, source) || other.source == source) &&
-            (identical(other.category, category) ||
-                other.category == category) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             const DeepCollectionEquality().equals(
               other._ingredients,
@@ -467,7 +475,7 @@ class _$RecipeImpl implements _Recipe {
     imageUrl,
     notes,
     source,
-    category,
+    const DeepCollectionEquality().hash(_tags),
     userId,
     const DeepCollectionEquality().hash(_ingredients),
   );
@@ -494,7 +502,7 @@ abstract class _Recipe implements Recipe {
     @JsonKey(name: 'image_url') required final String imageUrl,
     final String? notes,
     required final RecipeSource source,
-    required final RecipeCategory category,
+    final List<String>? tags,
     @JsonKey(name: 'user_id') final String? userId,
     final List<Ingredient>? ingredients,
   }) = _$RecipeImpl;
@@ -515,7 +523,7 @@ abstract class _Recipe implements Recipe {
   @override
   RecipeSource get source;
   @override
-  RecipeCategory get category;
+  List<String>? get tags;
   @override
   @JsonKey(name: 'user_id')
   String? get userId;
@@ -542,7 +550,7 @@ mixin _$InsertRecipe {
   String get imageUrl => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   RecipeSource get source => throw _privateConstructorUsedError;
-  RecipeCategory get category => throw _privateConstructorUsedError;
+  List<String>? get tags => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   List<Ingredient>? get ingredients => throw _privateConstructorUsedError;
@@ -570,7 +578,7 @@ abstract class $InsertRecipeCopyWith<$Res> {
     @JsonKey(name: 'image_url') String imageUrl,
     String? notes,
     RecipeSource source,
-    RecipeCategory category,
+    List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
   });
@@ -596,7 +604,7 @@ class _$InsertRecipeCopyWithImpl<$Res, $Val extends InsertRecipe>
     Object? imageUrl = null,
     Object? notes = freezed,
     Object? source = null,
-    Object? category = null,
+    Object? tags = freezed,
     Object? userId = freezed,
     Object? ingredients = freezed,
   }) {
@@ -622,10 +630,10 @@ class _$InsertRecipeCopyWithImpl<$Res, $Val extends InsertRecipe>
                 ? _value.source
                 : source // ignore: cast_nullable_to_non_nullable
                       as RecipeSource,
-            category: null == category
-                ? _value.category
-                : category // ignore: cast_nullable_to_non_nullable
-                      as RecipeCategory,
+            tags: freezed == tags
+                ? _value.tags
+                : tags // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
             userId: freezed == userId
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
@@ -655,7 +663,7 @@ abstract class _$$InsertRecipeImplCopyWith<$Res>
     @JsonKey(name: 'image_url') String imageUrl,
     String? notes,
     RecipeSource source,
-    RecipeCategory category,
+    List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
   });
@@ -680,7 +688,7 @@ class __$$InsertRecipeImplCopyWithImpl<$Res>
     Object? imageUrl = null,
     Object? notes = freezed,
     Object? source = null,
-    Object? category = null,
+    Object? tags = freezed,
     Object? userId = freezed,
     Object? ingredients = freezed,
   }) {
@@ -706,10 +714,10 @@ class __$$InsertRecipeImplCopyWithImpl<$Res>
             ? _value.source
             : source // ignore: cast_nullable_to_non_nullable
                   as RecipeSource,
-        category: null == category
-            ? _value.category
-            : category // ignore: cast_nullable_to_non_nullable
-                  as RecipeCategory,
+        tags: freezed == tags
+            ? _value._tags
+            : tags // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
         userId: freezed == userId
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
@@ -732,10 +740,11 @@ class _$InsertRecipeImpl implements _InsertRecipe {
     @JsonKey(name: 'image_url') required this.imageUrl,
     this.notes,
     required this.source,
-    required this.category,
+    final List<String>? tags,
     @JsonKey(name: 'user_id') this.userId,
     final List<Ingredient>? ingredients,
-  }) : _ingredients = ingredients;
+  }) : _tags = tags,
+       _ingredients = ingredients;
 
   factory _$InsertRecipeImpl.fromJson(Map<String, dynamic> json) =>
       _$$InsertRecipeImplFromJson(json);
@@ -751,8 +760,16 @@ class _$InsertRecipeImpl implements _InsertRecipe {
   final String? notes;
   @override
   final RecipeSource source;
+  final List<String>? _tags;
   @override
-  final RecipeCategory category;
+  List<String>? get tags {
+    final value = _tags;
+    if (value == null) return null;
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
@@ -768,7 +785,7 @@ class _$InsertRecipeImpl implements _InsertRecipe {
 
   @override
   String toString() {
-    return 'InsertRecipe(title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, category: $category, userId: $userId, ingredients: $ingredients)';
+    return 'InsertRecipe(title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, tags: $tags, userId: $userId, ingredients: $ingredients)';
   }
 
   @override
@@ -782,8 +799,7 @@ class _$InsertRecipeImpl implements _InsertRecipe {
                 other.imageUrl == imageUrl) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.source, source) || other.source == source) &&
-            (identical(other.category, category) ||
-                other.category == category) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             const DeepCollectionEquality().equals(
               other._ingredients,
@@ -800,7 +816,7 @@ class _$InsertRecipeImpl implements _InsertRecipe {
     imageUrl,
     notes,
     source,
-    category,
+    const DeepCollectionEquality().hash(_tags),
     userId,
     const DeepCollectionEquality().hash(_ingredients),
   );
@@ -826,7 +842,7 @@ abstract class _InsertRecipe implements InsertRecipe {
     @JsonKey(name: 'image_url') required final String imageUrl,
     final String? notes,
     required final RecipeSource source,
-    required final RecipeCategory category,
+    final List<String>? tags,
     @JsonKey(name: 'user_id') final String? userId,
     final List<Ingredient>? ingredients,
   }) = _$InsertRecipeImpl;
@@ -846,7 +862,7 @@ abstract class _InsertRecipe implements InsertRecipe {
   @override
   RecipeSource get source;
   @override
-  RecipeCategory get category;
+  List<String>? get tags;
   @override
   @JsonKey(name: 'user_id')
   String? get userId;

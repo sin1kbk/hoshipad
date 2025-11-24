@@ -34,10 +34,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final _urlController = TextEditingController();
   final _imageUrlController = TextEditingController();
   final _notesController = TextEditingController();
+  final _tagInputController = TextEditingController();
   final _scraperService = CookpadScraperService();
 
   RecipeSource _selectedSource = RecipeSource.youtube;
-  RecipeCategory _selectedCategory = RecipeCategory.meat;
+  List<String> _selectedTags = [];
 
   // 材料のコントローラーリスト
   final List<({TextEditingController name, TextEditingController amount})> _ingredientControllers = [];
@@ -91,8 +92,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       if (recipe.notes != null) {
         _notesController.text = recipe.notes!;
       }
+      if (recipe.tags != null) {
+        _selectedTags = List.from(recipe.tags!);
+      }
       _selectedSource = recipe.source;
-      _selectedCategory = recipe.category;
     }
 
     _imageUrlController.addListener(_onImageUrlChanged);
@@ -110,6 +113,16 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     controllers.name.dispose();
     controllers.amount.dispose();
     setState(() {});
+  }
+
+  void _addTag(String tag) {
+    final trimmedTag = tag.trim();
+    if (trimmedTag.isNotEmpty && !_selectedTags.contains(trimmedTag)) {
+      setState(() {
+        _selectedTags.add(trimmedTag);
+        _tagInputController.clear();
+      });
+    }
   }
 
   void _onImageUrlChanged() {
@@ -173,7 +186,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           }
 
           if (metadata.suggestedCategory != null) {
-            _selectedCategory = metadata.suggestedCategory!;
+            if (!_selectedTags.contains(metadata.suggestedCategory!)) {
+              _selectedTags.add(metadata.suggestedCategory!);
+            }
           }
           _isLoadingMetadata = false;
         });
@@ -219,6 +234,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     _urlController.dispose();
     _imageUrlController.dispose();
     _notesController.dispose();
+    _tagInputController.dispose();
     for (var controller in _ingredientControllers) {
       controller.name.dispose();
       controller.amount.dispose();
@@ -447,17 +463,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               TextFormField(
                 controller: _imageUrlController,
                 decoration: const InputDecoration(
-                  labelText: '画像のURL (一時的)',
-                  hintText: 'https://...',
+                  labelText: '画像のURL',
+                  hintText: 'https://... (任意)',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.image),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '画像URLを入力してください';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 24),
 
@@ -489,34 +499,82 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              _buildSectionLabel('タグ (任意)'),
+              Row(
+                children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('カテゴリー'),
-                        DropdownButtonFormField<RecipeCategory>(
-                          value: _selectedCategory,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          ),
-                          items: RecipeCategory.values.map((category) {
-                            return DropdownMenuItem(
-                              value: category,
-                              child: Text(category.displayName),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() => _selectedCategory = value);
-                            }
-                          },
-                        ),
-                      ],
+                    child: TextFormField(
+                      controller: _tagInputController,
+                      decoration: const InputDecoration(
+                        hintText: 'タグを入力',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.local_offer),
+                      ),
+                      onFieldSubmitted: (value) {
+                        _addTag(value);
+                      },
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      _addTag(_tagInputController.text);
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('追加'),
+                  ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              if (_selectedTags.isNotEmpty) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _selectedTags.map((tag) {
+                    return Chip(
+                      label: Text(tag),
+                      deleteIcon: const Icon(Icons.close, size: 18),
+                      onDeleted: () {
+                        setState(() {
+                          _selectedTags.remove(tag);
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+              ],
+              Text(
+                'プリセットタグ:',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: RecipeCategory.values.map((category) {
+                  final tagName = category.displayName;
+                  final isSelected = _selectedTags.contains(tagName);
+                  return FilterChip(
+                    label: Text(tagName),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          if (!_selectedTags.contains(tagName)) {
+                            _selectedTags.add(tagName);
+                          }
+                        } else {
+                          _selectedTags.remove(tagName);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 24),
 
@@ -631,7 +689,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       imageUrl: _imageUrlController.text,
       notes: _notesController.text.isEmpty ? null : _notesController.text,
       source: _selectedSource,
-      category: _selectedCategory,
+      tags: _selectedTags.isEmpty ? null : _selectedTags,
       ingredients: ingredients.isEmpty ? null : ingredients,
     );
 

@@ -130,7 +130,7 @@ class CookpadScraperService {
   }
 
   /// タイトルと材料からカテゴリを推定
-  RecipeCategory _suggestCategory(String title, List<Ingredient> ingredients) {
+  String _suggestCategory(String title, List<Ingredient> ingredients) {
     final titleLower = title.toLowerCase();
     final allText = '$title ${ingredients.map((i) => i.name).join(' ')}'.toLowerCase();
 
@@ -140,7 +140,7 @@ class CookpadScraperService {
         allText.contains('豚') ||
         allText.contains('牛') ||
         allText.contains('チキン')) {
-      return RecipeCategory.meat;
+      return RecipeCategory.meat.displayName;
     }
 
     if (allText.contains('魚') ||
@@ -148,18 +148,18 @@ class CookpadScraperService {
         allText.contains('イカ') ||
         allText.contains('貝') ||
         allText.contains('海鮮')) {
-      return RecipeCategory.seafood;
+      return RecipeCategory.seafood.displayName;
     }
 
     if (allText.contains('サラダ')) {
-      return RecipeCategory.salad;
+      return RecipeCategory.salad.displayName;
     }
 
     if (allText.contains('ご飯') ||
         allText.contains('丼') ||
         allText.contains('チャーハン') ||
         allText.contains('リゾット')) {
-      return RecipeCategory.rice;
+      return RecipeCategory.rice.displayName;
     }
 
     if (allText.contains('麺') ||
@@ -167,43 +167,43 @@ class CookpadScraperService {
         allText.contains('うどん') ||
         allText.contains('そば') ||
         allText.contains('ラーメン')) {
-      return RecipeCategory.noodle;
+      return RecipeCategory.noodle.displayName;
     }
 
     if (allText.contains('スープ') ||
         allText.contains('汁') ||
         allText.contains('味噌汁')) {
-      return RecipeCategory.soup;
+      return RecipeCategory.soup.displayName;
     }
 
     if (allText.contains('ケーキ') ||
         allText.contains('クッキー') ||
         allText.contains('お菓子')) {
-      return RecipeCategory.sweets;
+      return RecipeCategory.sweets.displayName;
     }
 
     if (allText.contains('デザート') ||
         allText.contains('プリン') ||
         allText.contains('ゼリー')) {
-      return RecipeCategory.dessert;
+      return RecipeCategory.dessert.displayName;
     }
 
     if (allText.contains('パン')) {
-      return RecipeCategory.bread;
+      return RecipeCategory.bread.displayName;
     }
 
     if (allText.contains('弁当')) {
-      return RecipeCategory.bento;
+      return RecipeCategory.bento.displayName;
     }
 
     // 野菜が多い場合は野菜料理
     final vegetableKeywords = ['野菜', 'キャベツ', 'にんじん', '大根', 'トマト', 'なす', 'ピーマン'];
     if (vegetableKeywords.any((keyword) => allText.contains(keyword))) {
-      return RecipeCategory.vegetable;
+      return RecipeCategory.vegetable.displayName;
     }
 
     // デフォルトはその他
-    return RecipeCategory.other;
+    return RecipeCategory.other.displayName;
   }
 }
 
@@ -212,7 +212,7 @@ class RecipeMetadata {
   final String title;
   final String imageUrl;
   final List<Ingredient> ingredients;
-  final RecipeCategory? suggestedCategory;
+  final String? suggestedCategory;
 
   RecipeMetadata({
     required this.title,
