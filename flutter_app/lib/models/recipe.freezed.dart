@@ -200,6 +200,10 @@ mixin _$Recipe {
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   List<Ingredient>? get ingredients => throw _privateConstructorUsedError;
+  @JsonKey(name: 'like_count')
+  int get likeCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_liked_by_current_user')
+  bool get isLikedByCurrentUser => throw _privateConstructorUsedError;
 
   /// Serializes this Recipe to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -225,6 +229,8 @@ abstract class $RecipeCopyWith<$Res> {
     List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
+    @JsonKey(name: 'like_count') int likeCount,
+    @JsonKey(name: 'is_liked_by_current_user') bool isLikedByCurrentUser,
   });
 }
 
@@ -252,6 +258,8 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
     Object? tags = freezed,
     Object? userId = freezed,
     Object? ingredients = freezed,
+    Object? likeCount = null,
+    Object? isLikedByCurrentUser = null,
   }) {
     return _then(
       _value.copyWith(
@@ -291,6 +299,14 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
                 ? _value.ingredients
                 : ingredients // ignore: cast_nullable_to_non_nullable
                       as List<Ingredient>?,
+            likeCount: null == likeCount
+                ? _value.likeCount
+                : likeCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            isLikedByCurrentUser: null == isLikedByCurrentUser
+                ? _value.isLikedByCurrentUser
+                : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -315,6 +331,8 @@ abstract class _$$RecipeImplCopyWith<$Res> implements $RecipeCopyWith<$Res> {
     List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
+    @JsonKey(name: 'like_count') int likeCount,
+    @JsonKey(name: 'is_liked_by_current_user') bool isLikedByCurrentUser,
   });
 }
 
@@ -341,6 +359,8 @@ class __$$RecipeImplCopyWithImpl<$Res>
     Object? tags = freezed,
     Object? userId = freezed,
     Object? ingredients = freezed,
+    Object? likeCount = null,
+    Object? isLikedByCurrentUser = null,
   }) {
     return _then(
       _$RecipeImpl(
@@ -380,6 +400,14 @@ class __$$RecipeImplCopyWithImpl<$Res>
             ? _value._ingredients
             : ingredients // ignore: cast_nullable_to_non_nullable
                   as List<Ingredient>?,
+        likeCount: null == likeCount
+            ? _value.likeCount
+            : likeCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        isLikedByCurrentUser: null == isLikedByCurrentUser
+            ? _value.isLikedByCurrentUser
+            : isLikedByCurrentUser // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -398,6 +426,9 @@ class _$RecipeImpl implements _Recipe {
     final List<String>? tags,
     @JsonKey(name: 'user_id') this.userId,
     final List<Ingredient>? ingredients,
+    @JsonKey(name: 'like_count') this.likeCount = 0,
+    @JsonKey(name: 'is_liked_by_current_user')
+    this.isLikedByCurrentUser = false,
   }) : _tags = tags,
        _ingredients = ingredients;
 
@@ -441,8 +472,15 @@ class _$RecipeImpl implements _Recipe {
   }
 
   @override
+  @JsonKey(name: 'like_count')
+  final int likeCount;
+  @override
+  @JsonKey(name: 'is_liked_by_current_user')
+  final bool isLikedByCurrentUser;
+
+  @override
   String toString() {
-    return 'Recipe(id: $id, title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, tags: $tags, userId: $userId, ingredients: $ingredients)';
+    return 'Recipe(id: $id, title: $title, url: $url, imageUrl: $imageUrl, notes: $notes, source: $source, tags: $tags, userId: $userId, ingredients: $ingredients, likeCount: $likeCount, isLikedByCurrentUser: $isLikedByCurrentUser)';
   }
 
   @override
@@ -462,7 +500,11 @@ class _$RecipeImpl implements _Recipe {
             const DeepCollectionEquality().equals(
               other._ingredients,
               _ingredients,
-            ));
+            ) &&
+            (identical(other.likeCount, likeCount) ||
+                other.likeCount == likeCount) &&
+            (identical(other.isLikedByCurrentUser, isLikedByCurrentUser) ||
+                other.isLikedByCurrentUser == isLikedByCurrentUser));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -478,6 +520,8 @@ class _$RecipeImpl implements _Recipe {
     const DeepCollectionEquality().hash(_tags),
     userId,
     const DeepCollectionEquality().hash(_ingredients),
+    likeCount,
+    isLikedByCurrentUser,
   );
 
   /// Create a copy of Recipe
@@ -505,6 +549,8 @@ abstract class _Recipe implements Recipe {
     final List<String>? tags,
     @JsonKey(name: 'user_id') final String? userId,
     final List<Ingredient>? ingredients,
+    @JsonKey(name: 'like_count') final int likeCount,
+    @JsonKey(name: 'is_liked_by_current_user') final bool isLikedByCurrentUser,
   }) = _$RecipeImpl;
 
   factory _Recipe.fromJson(Map<String, dynamic> json) = _$RecipeImpl.fromJson;
@@ -529,6 +575,12 @@ abstract class _Recipe implements Recipe {
   String? get userId;
   @override
   List<Ingredient>? get ingredients;
+  @override
+  @JsonKey(name: 'like_count')
+  int get likeCount;
+  @override
+  @JsonKey(name: 'is_liked_by_current_user')
+  bool get isLikedByCurrentUser;
 
   /// Create a copy of Recipe
   /// with the given fields replaced by the non-null parameter values.

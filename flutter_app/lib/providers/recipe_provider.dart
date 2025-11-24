@@ -13,14 +13,14 @@ class RecipeProvider with ChangeNotifier {
 
   String _searchQuery = '';
   RecipeSource? _sourceFilter;
-  RecipeCategory? _categoryFilter;
+  String? _tagFilter;
 
   List<Recipe> get recipes => _recipes;
   bool get isLoading => _isLoading;
   String? get error => _error;
   String get searchQuery => _searchQuery;
   RecipeSource? get sourceFilter => _sourceFilter;
-  RecipeCategory? get categoryFilter => _categoryFilter;
+  String? get tagFilter => _tagFilter;
 
   Future<void> loadRecipes() async {
     _isLoading = true;
@@ -31,7 +31,7 @@ class RecipeProvider with ChangeNotifier {
       _recipes = await _apiService.searchRecipes(
         query: _searchQuery.isEmpty ? null : _searchQuery,
         source: _sourceFilter,
-        category: _categoryFilter,
+        tag: _tagFilter,
       );
     } catch (e) {
       _error = e.toString();
@@ -51,15 +51,15 @@ class RecipeProvider with ChangeNotifier {
     loadRecipes();
   }
 
-  void setCategoryFilter(RecipeCategory? category) {
-    _categoryFilter = category;
+  void setTagFilter(String? tag) {
+    _tagFilter = tag;
     loadRecipes();
   }
 
   void clearFilters() {
     _searchQuery = '';
     _sourceFilter = null;
-    _categoryFilter = null;
+    _tagFilter = null;
     loadRecipes();
   }
 

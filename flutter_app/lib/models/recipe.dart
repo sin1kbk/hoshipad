@@ -110,6 +110,8 @@ class Recipe with _$Recipe {
     List<String>? tags,
     @JsonKey(name: 'user_id') String? userId,
     List<Ingredient>? ingredients,
+    @JsonKey(name: 'like_count') @Default(0) int likeCount,
+    @JsonKey(name: 'is_liked_by_current_user') @Default(false) bool isLikedByCurrentUser,
   }) = _Recipe;
 
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
@@ -121,11 +123,11 @@ class InsertRecipe with _$InsertRecipe {
     required String title,
     required String url,
     @JsonKey(name: 'image_url') required String imageUrl,
-    String? notes,
+    @JsonKey(includeIfNull: false) String? notes,
     required RecipeSource source,
-    List<String>? tags,
-    @JsonKey(name: 'user_id') String? userId,
-    List<Ingredient>? ingredients,
+    @JsonKey(includeIfNull: false) List<String>? tags,
+    @JsonKey(name: 'user_id', includeIfNull: false) String? userId,
+    @JsonKey(includeIfNull: false) List<Ingredient>? ingredients,
   }) = _InsertRecipe;
 
   factory InsertRecipe.fromJson(Map<String, dynamic> json) =>

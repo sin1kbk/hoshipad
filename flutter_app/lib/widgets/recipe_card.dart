@@ -7,6 +7,7 @@ class RecipeCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onLike;
 
   const RecipeCard({
     super.key,
@@ -14,6 +15,7 @@ class RecipeCard extends StatelessWidget {
     this.onTap,
     this.onEdit,
     this.onDelete,
+    this.onLike,
   });
 
   @override
@@ -62,27 +64,33 @@ class RecipeCard extends StatelessWidget {
                 Positioned(
                   bottom: 4,
                   right: 4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.favorite,
-                            color: Colors.pinkAccent, size: 10),
-                        const SizedBox(width: 2),
-                        Text(
-                          '128', // Placeholder for like count
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                        ),
-                      ],
+                  child: GestureDetector(
+                    onTap: onLike,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            recipe.isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                            color: recipe.isLikedByCurrentUser ? Colors.pinkAccent : Colors.white,
+                            size: 10,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            '${recipe.likeCount}',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -124,6 +132,50 @@ class RecipeCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    // タグ表示
+                    if (recipe.tags != null && recipe.tags!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          // 最大3つまで表示
+                          ...recipe.tags!.take(3).map((tag) => Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange[50],
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.orange[200]!),
+                                ),
+                                child: Text(
+                                  tag,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.orange[800],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              )),
+                          // 3つ以上ある場合は "+N" を表示
+                          if (recipe.tags!.length > 3)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '+${recipe.tags!.length - 3}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                     if (onEdit != null || onDelete != null) ...[
                       const SizedBox(height: 8),
                       Row(

@@ -27,6 +27,8 @@ _$RecipeImpl _$$RecipeImplFromJson(Map<String, dynamic> json) => _$RecipeImpl(
   ingredients: (json['ingredients'] as List<dynamic>?)
       ?.map((e) => Ingredient.fromJson(e as Map<String, dynamic>))
       .toList(),
+  likeCount: (json['like_count'] as num?)?.toInt() ?? 0,
+  isLikedByCurrentUser: json['is_liked_by_current_user'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$$RecipeImplToJson(_$RecipeImpl instance) =>
@@ -40,6 +42,8 @@ Map<String, dynamic> _$$RecipeImplToJson(_$RecipeImpl instance) =>
       'tags': instance.tags,
       'user_id': instance.userId,
       'ingredients': instance.ingredients,
+      'like_count': instance.likeCount,
+      'is_liked_by_current_user': instance.isLikedByCurrentUser,
     };
 
 const _$RecipeSourceEnumMap = {

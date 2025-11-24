@@ -8,40 +8,55 @@ class ApiService {
       : _supabase = supabase ?? Supabase.instance.client;
 
   Future<List<Recipe>> getAllRecipes() async {
+    final currentUserId = _supabase.auth.currentUser?.id;
+
     final response = await _supabase
         .from('recipes')
-        .select()
+        .select('''
+          *,
+          recipe_likes(user_id)
+        ''')
         .order('created_at', ascending: false);
 
-    return (response as List).map((json) => Recipe.fromJson(json)).toList();
+    return _parseRecipesWithLikes(response, currentUserId);
   }
 
   /// ユーザーのレシピのみを取得
   Future<List<Recipe>> getUserRecipes(String userId) async {
+    final currentUserId = _supabase.auth.currentUser?.id;
+
     final response = await _supabase
         .from('recipes')
-        .select()
+        .select('''
+          *,
+          recipe_likes(user_id)
+        ''')
         .eq('user_id', userId)
         .order('created_at', ascending: false);
 
-    return (response as List).map((json) => Recipe.fromJson(json)).toList();
+    return _parseRecipesWithLikes(response, currentUserId);
   }
 
   Future<List<Recipe>> searchRecipes({
     String? query,
     RecipeSource? source,
-    RecipeCategory? category,
+    String? tag,
   }) async {
-    // 最初にselectを呼び出す
-    var queryBuilder = _supabase.from('recipes').select();
+    final currentUserId = _supabase.auth.currentUser?.id;
+
+    // 最初にselectを呼び出す（いいね情報を含む）
+    var queryBuilder = _supabase.from('recipes').select('''
+      *,
+      recipe_likes(user_id)
+    ''');
 
     // フィルター適用
     if (source != null) {
       queryBuilder = queryBuilder.eq('source', source.name);
     }
 
-    if (category != null) {
-      queryBuilder = queryBuilder.eq('category', category.displayName);
+    if (tag != null) {
+      queryBuilder = queryBuilder.contains('tags', [tag]);
     }
 
     // 検索クエリ
@@ -54,7 +69,7 @@ class ApiService {
 
     // ソートして結果を取得
     final response = await queryBuilder.order('created_at', ascending: false);
-    return (response as List).map((json) => Recipe.fromJson(json)).toList();
+    return _parseRecipesWithLikes(response, currentUserId);
   }
 
   Future<Recipe> createRecipe(InsertRecipe recipe) async {
@@ -74,9 +89,14 @@ class ApiService {
   }
 
   Future<Recipe> updateRecipe(int id, InsertRecipe recipe) async {
+    // toJson()を取得してuser_idを除外
+    // UPDATE時はuser_idを変更してはいけない
+    final json = Map<String, dynamic>.from(recipe.toJson());
+    json.remove('user_id');
+
     final response = await _supabase
         .from('recipes')
-        .update(recipe.toJson())
+        .update(json)
         .eq('id', id)
         .select()
         .single();
@@ -86,5 +106,32 @@ class ApiService {
 
   Future<void> deleteRecipe(int id) async {
     await _supabase.from('recipes').delete().eq('id', id);
+  }
+
+  /// いいね情報を含むレシピデータをパース
+  List<Recipe> _parseRecipesWithLikes(dynamic response, String? currentUserId) {
+    final recipes = response as List;
+
+    return recipes.map((json) {
+      // recipe_likesからいいね情報を計算
+      final likesData = json['recipe_likes'] as List?;
+
+      // いいね数を計算
+      final likeCount = likesData?.length ?? 0;
+
+      // 現在のユーザーがいいねしているかチェック
+      final isLiked = currentUserId != null &&
+          (likesData?.any((like) => like['user_id'] == currentUserId) ?? false);
+
+      // 元のjsonにいいね情報を追加
+      final recipeJson = Map<String, dynamic>.from(json);
+      recipeJson['like_count'] = likeCount;
+      recipeJson['is_liked_by_current_user'] = isLiked;
+
+      // recipe_likesを削除（モデルに不要）
+      recipeJson.remove('recipe_likes');
+
+      return Recipe.fromJson(recipeJson);
+    }).toList();
   }
 }

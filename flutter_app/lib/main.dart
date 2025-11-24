@@ -13,6 +13,7 @@ import 'providers/recipe_provider.dart';
 import 'providers/shopping_list_provider.dart';
 import 'providers/history_provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/like_provider.dart';
 import 'services/local_storage_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_recipe_screen.dart';
@@ -203,6 +204,9 @@ class _MyAppState extends State<MyApp> {
             LocalStorageService(),
             ApiService(),
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => LikeProvider(),
         ),
       ],
       child: MaterialApp.router(

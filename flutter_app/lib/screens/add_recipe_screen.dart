@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../providers/auth_provider.dart';
+import '../services/cookpad_scraper_service.dart';
 import '../services/cookpad_scraper_service.dart';
 import '../widgets/platform_image.dart';
 
@@ -50,21 +52,61 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   void initState() {
     super.initState();
 
+    // 認証チェック
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final authProvider = context.read<AuthProvider>();
+
+      // 未認証チェック
+      if (!authProvider.isAuthenticated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('レシピを追加・編集するにはログインが必要です'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.of(context).pop();
+        context.go('/login');
+        return;
+      }
+
+      // 編集モードの場合、作成者チェック
+      if (widget.recipe != null) {
+        final currentUserId = authProvider.currentUser?.id;
+        final recipeUserId = widget.recipe!.userId;
+
+        if (currentUserId != recipeUserId) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('自分が作成したレシピのみ編集できます'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          Navigator.of(context).pop();
+          return;
+        }
+      }
+    });
+
+    // Shared URLが提供されている場合
     if (widget.sharedUrl != null) {
       _urlController.text = widget.sharedUrl!;
+      // _loadRecipeFromUrl(); // This method is not defined in the provided context. Assuming it's a placeholder or needs to be added elsewhere.
     }
 
-    if (widget.prefilledTitle != null && widget.prefilledTitle!.isNotEmpty) {
+    // プレフィルされた値をセット
+    if (widget.prefilledTitle != null) {
       _titleController.text = widget.prefilledTitle!;
     }
-
-    if (widget.prefilledImageUrl != null && widget.prefilledImageUrl!.isNotEmpty) {
+    if (widget.prefilledImageUrl != null) {
       _imageUrlController.text = widget.prefilledImageUrl!;
     }
 
-    // 初期材料データの読み込み
+    // 初期材料の取得
     List<Ingredient> initialIngredients = [];
-    if (widget.prefilledIngredients != null && widget.prefilledIngredients!.isNotEmpty) {
+    if (widget.prefilledIngredients != null) {
       try {
         final List<dynamic> jsonList = jsonDecode(widget.prefilledIngredients!);
         initialIngredients = jsonList.map((json) => Ingredient.fromJson(json)).toList();
@@ -84,6 +126,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       _addIngredientRow();
     }
 
+    // 既存のレシピがある場合（編集モード）
     if (widget.recipe != null) {
       final recipe = widget.recipe!;
       _titleController.text = recipe.title;
@@ -700,10 +743,11 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('レシピが更新されました！')),
           );
+          // 編集画面を閉じる
+          Navigator.of(context).pop();
+          // RecipeDetailScreenも閉じてHomeScreenに戻る
           if (context.canPop()) {
-            context.pop();
-          } else {
-            context.go('/');
+            Navigator.of(context).pop();
           }
         }
       } else {

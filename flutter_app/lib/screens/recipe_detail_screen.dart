@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../models/recipe.dart';
 import '../providers/history_provider.dart';
+import '../providers/auth_provider.dart';
 import 'add_recipe_screen.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
@@ -54,13 +55,25 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               ),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => AddRecipeScreen(recipe: recipe),
-                    ),
+              // 作成者のみ編集ボタンを表示
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final currentUserId = authProvider.currentUser?.id;
+                  final isCreator = currentUserId != null && currentUserId == recipe.userId;
+
+                  if (!isCreator) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => AddRecipeScreen(recipe: recipe),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

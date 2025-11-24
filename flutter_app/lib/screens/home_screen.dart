@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/like_provider.dart';
 import '../widgets/recipe_card.dart';
 import '../widgets/hoshipad_logo.dart';
 import 'recipe_detail_screen.dart';
@@ -122,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           onDelete: isCreator ? () => _deleteRecipe(context, recipe) : null,
+                          onLike: () => _toggleLike(context, recipe),
                         );
                       },
                     ),
@@ -134,32 +136,20 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final authProvider = context.read<AuthProvider>();
-          if (authProvider.isAuthenticated) {
-            context.push('/add');
-           } else {
-            // 未認証の場合はログイン画面に誘導
-            showDialog(
-              context: context,
-              builder: (dialogContext) => AlertDialog(
-                title: const Text('ログインが必要です'),
-                content: const Text('レシピを追加するにはログインが必要です。'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(),
-                    child: const Text('キャンセル'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                      // /addへのリダイレクトパラメータを追加
-                      context.push('/login?redirect=/add');
-                    },
-                    child: const Text('ログイン'),
-                  ),
-                ],
+          if (!authProvider.isAuthenticated) {
+            // 未認証の場合はログイン画面にリダイレクト
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('レシピを追加するにはログインが必要です'),
+                duration: Duration(seconds: 2),
               ),
             );
+            context.go('/login');
+            return;
           }
+
+          // 認証済みの場合はレシピ追加画面を開く
+          context.go('/add');
         },
         backgroundColor: const Color(0xFFFF7400),
         child: const Icon(Icons.add, color: Colors.white),
@@ -188,15 +178,15 @@ class _HomeScreenState extends State<HomeScreen> {
             separatorBuilder: (context, index) => const SizedBox(width: 20),
             itemBuilder: (context, index) {
               final category = RecipeCategory.values[index];
-              final isSelected = provider.categoryFilter == category;
+              final isSelected = provider.tagFilter == category.displayName;
               return _CategoryItem(
                 category: category,
                 isSelected: isSelected,
                 onTap: () {
                   if (isSelected) {
-                    provider.setCategoryFilter(null);
+                    provider.setTagFilter(null);
                   } else {
-                    provider.setCategoryFilter(category);
+                    provider.setTagFilter(category.displayName);
                   }
                 },
               );
@@ -214,6 +204,32 @@ class _HomeScreenState extends State<HomeScreen> {
             fontWeight: FontWeight.bold,
           ),
     );
+  }
+
+  Future<void> _toggleLike(BuildContext context, Recipe recipe) async {
+    final authProvider = context.read<AuthProvider>();
+    if (!authProvider.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('いいねするにはログインが必要です')),
+      );
+      return;
+    }
+
+    try {
+      final likeProvider = context.read<LikeProvider>();
+      await likeProvider.toggleLike(recipe.id, recipe.isLikedByCurrentUser);
+
+      // レシピリストを再読み込み
+      if (context.mounted) {
+        await context.read<RecipeProvider>().loadRecipes();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('エラーが発生しました: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _deleteRecipe(BuildContext context, Recipe recipe) async {
