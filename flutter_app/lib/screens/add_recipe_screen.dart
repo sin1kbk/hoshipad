@@ -127,8 +127,22 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     List<Ingredient> initialIngredients = [];
     if (widget.prefilledIngredients != null) {
       try {
-        final List<dynamic> jsonList = jsonDecode(widget.prefilledIngredients!);
-        initialIngredients = jsonList.map((json) => Ingredient.fromJson(json)).toList();
+        // ブックマークレットから送信される形式: "name:quantity\nname:quantity"
+        final lines = widget.prefilledIngredients!.split('\n');
+        for (var line in lines) {
+          final trimmedLine = line.trim();
+          if (trimmedLine.isEmpty) continue;
+
+          final parts = trimmedLine.split(':');
+          if (parts.length >= 2) {
+            final name = parts[0].trim();
+            final quantity = parts.sublist(1).join(':').trim(); // コロンが複数ある場合に対応
+            if (name.isNotEmpty) {
+              initialIngredients.add(Ingredient(name: name, amount: quantity));
+            }
+          }
+        }
+        debugPrint('Parsed ${initialIngredients.length} ingredients from bookmarklet');
       } catch (e) {
         debugPrint('Failed to parse prefilled ingredients: $e');
       }
