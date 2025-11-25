@@ -24,6 +24,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
 import 'screens/auth/profile_screen.dart';
+import 'screens/auth/email_verification_screen.dart';
 import 'widgets/main_scaffold.dart';
 
 Future<void> main() async {
@@ -139,6 +140,11 @@ class _MyAppState extends State<MyApp> {
           path: '/profile-edit',
           parentNavigatorKey: rootNavigatorKey,
           builder: (context, state) => const ProfileScreen(),
+        ),
+        GoRoute(
+          path: '/email-verification',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => const EmailVerificationScreen(),
         ),
       ],
     );

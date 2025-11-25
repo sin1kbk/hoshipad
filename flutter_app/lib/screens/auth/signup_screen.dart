@@ -55,6 +55,13 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!mounted) return;
 
     if (success) {
+      // ログイン状態を確認（メール確認待ちの場合はログインしていない）
+      if (authProvider.currentUser == null) {
+        if (!mounted) return;
+        context.go('/email-verification');
+        return;
+      }
+
       // リダイレクト先を取得（デフォルトはホーム）
       final state = GoRouterState.of(context);
       final redirectTo = state.uri.queryParameters['redirect'] ?? '/';

@@ -80,14 +80,14 @@ class AuthProvider extends ChangeNotifier {
         displayName: displayName,
       );
 
-      if (response.user != null) {
+      // セッションがある場合はログイン状態にする（メール確認不要の場合）
+      if (response.session != null) {
         _currentUser = response.user;
         await _loadUserProfile();
-        return true;
       }
+      // セッションがない場合はメール確認待ち（ログイン状態にはしない）
 
-      _setError('サインアップに失敗しました');
-      return false;
+      return true;
     } on AuthException catch (e) {
       _setError(_getErrorMessage(e));
       return false;
