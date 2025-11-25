@@ -92,8 +92,27 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
     // Shared URLが提供されている場合
     if (widget.sharedUrl != null) {
+      debugPrint('=== AddRecipeScreen initState ===');
+      debugPrint('Shared URL: ${widget.sharedUrl}');
       _urlController.text = widget.sharedUrl!;
-      // _loadRecipeFromUrl(); // This method is not defined in the provided context. Assuming it's a placeholder or needs to be added elsewhere.
+
+      // URLからソースを自動判定
+      if (widget.sharedUrl!.contains('instagram.com')) {
+        debugPrint('Setting source to Instagram');
+        _selectedSource = RecipeSource.instagram;
+      } else if (widget.sharedUrl!.contains('cookpad.com')) {
+        debugPrint('Setting source to Cookpad');
+        _selectedSource = RecipeSource.cookpad;
+      } else if (widget.sharedUrl!.contains('youtube.com') || widget.sharedUrl!.contains('youtu.be')) {
+        debugPrint('Setting source to YouTube');
+        _selectedSource = RecipeSource.youtube;
+      } else if (widget.sharedUrl!.contains('twitter.com') || widget.sharedUrl!.contains('x.com')) {
+        debugPrint('Setting source to Twitter');
+        _selectedSource = RecipeSource.twitter;
+      }
+      debugPrint('Selected source after URL check: $_selectedSource');
+    } else {
+      debugPrint('=== AddRecipeScreen initState: No shared URL ===');
     }
 
     // プレフィルされた値をセット
@@ -180,7 +199,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     final isAuthenticated = authProvider.isAuthenticated;
 
     if (isAuthenticated && !_hasTriedAutoFetch && widget.sharedUrl != null) {
-      if (widget.sharedUrl!.contains('cookpad.com')) {
+      if (widget.sharedUrl!.contains('instagram.com')) {
+        _selectedSource = RecipeSource.instagram;
+        _hasTriedAutoFetch = true;
+      } else if (widget.sharedUrl!.contains('cookpad.com')) {
         _selectedSource = RecipeSource.cookpad;
         _hasTriedAutoFetch = true;
 
