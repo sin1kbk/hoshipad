@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -12,6 +14,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
+  final _picker = ImagePicker();
   bool _isEditing = false;
 
   @override
@@ -31,6 +34,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final profile = authProvider.currentUserProfile;
     if (profile != null) {
       _displayNameController.text = profile.displayName;
+    }
+  }
+
+  Future<void> _handleImageUpload() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 70,
+      );
+
+      if (image == null) return;
+
+      if (!mounted) return;
+      final authProvider = context.read<AuthProvider>();
+
+      // ローディング表示
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('画像をアップロード中...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      final bytes = await image.readAsBytes();
+      final url = await authProvider.uploadAvatar(
+        filePath: image.name,
+        fileBytes: bytes,
+      );
+
+      if (url != null) {
+        await authProvider.updateProfile(avatarUrl: url);
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('プロフィール画像を更新しました'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.errorMessage ?? '画像のアップロードに失敗しました'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('エラーが発生しました: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -106,6 +167,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) {
       return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/'),
+          ),
           title: const Text('プロフィール'),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
@@ -119,6 +184,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/'),
+        ),
         title: const Text('プロフィール'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -175,14 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 size: 20,
                                 color: Colors.white,
                               ),
-                              onPressed: () {
-                                // TODO: 画像アップロード機能を実装
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('画像アップロード機能は準備中です'),
-                                  ),
-                                );
-                              },
+                              onPressed: authProvider.isLoading ? null : _handleImageUpload,
                             ),
                           ),
                         ),

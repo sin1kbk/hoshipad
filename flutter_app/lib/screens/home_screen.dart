@@ -37,29 +37,38 @@ class _HomeScreenState extends State<HomeScreen> {
         scrolledUnderElevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Row(
-          children: [
-            const HoshipadLogo(size: 32),
-            const SizedBox(width: 8),
-            Text(
-              'hoshipad',
-              style: GoogleFonts.poppins(
-                color: const Color(0xFFFF7400),
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Text('📌', style: TextStyle(fontSize: 24)),
-              tooltip: 'ブックマークレットを追加',
-              onPressed: () => _showBookmarkletDialog(context),
-            ),
-            IconButton(
-              icon: const Icon(Icons.notifications_none, color: Colors.grey),
-              onPressed: () {},
-            ),
-          ],
+        title: Consumer<AuthProvider>(
+          builder: (context, authProvider, _) {
+            return Row(
+              children: [
+                const HoshipadLogo(size: 32),
+                const SizedBox(width: 8),
+                Text(
+                  'hoshipad',
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFFFF7400),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Text('📌', style: TextStyle(fontSize: 24)),
+                  tooltip: 'ブックマークレットを追加',
+                  onPressed: () => _showBookmarkletDialog(context),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.notifications_none, color: Colors.grey),
+                  onPressed: () {},
+                ),
+                // ログイン状態に応じたボタン/アイコンを表示
+                if (authProvider.isAuthenticated)
+                  _buildUserMenu(context, authProvider)
+                else
+                  _buildLoginButton(context),
+              ],
+            );
+          },
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -275,6 +284,330 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
+
+  // ログインボタンを構築
+  Widget _buildLoginButton(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFF7400), Color(0xFFFF9500)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF7400).withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.go('/login'),
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: const Text(
+              'ログイン',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ユーザーメニューを構築
+  Widget _buildUserMenu(BuildContext context, AuthProvider authProvider) {
+    final userProfile = authProvider.currentUserProfile;
+    final avatarUrl = userProfile?.avatarUrl;
+    final displayName = userProfile?.displayName ?? 'ユーザー';
+    final userEmail = authProvider.currentUser?.email ?? '';
+
+    return PopupMenuButton<String>(
+      offset: const Offset(-20, 55),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: Colors.white,
+      padding: EdgeInsets.zero,
+      child: Container(
+        margin: const EdgeInsets.only(left: 8),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFF7400).withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: CircleAvatar(
+          radius: 18,
+          backgroundColor: const Color(0xFFFF7400),
+          backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+              ? CachedNetworkImageProvider(avatarUrl)
+              : null,
+          child: avatarUrl == null || avatarUrl.isEmpty
+              ? Text(
+                  displayName.isNotEmpty
+                      ? displayName[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                )
+              : null,
+        ),
+      ),
+      onSelected: (String value) async {
+        if (value == 'profile') {
+          context.go('/profile-edit');
+        } else if (value == 'signout') {
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              title: const Text(
+                'サインアウト',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              content: const Text(
+                'サインアウトしますか？',
+                style: TextStyle(fontSize: 15),
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: Text(
+                    'キャンセル',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF7400), Color(0xFFFF9500)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF7400).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'サインアウト',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmed == true && context.mounted) {
+            await authProvider.signOut();
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('サインアウトしました'),
+                  backgroundColor: const Color(0xFFFF7400),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                ),
+              );
+              context.go('/');
+            }
+          }
+        }
+      },
+      itemBuilder: (BuildContext context) => [
+        // ユーザー情報ヘッダー
+        PopupMenuItem<String>(
+          enabled: false,
+          padding: EdgeInsets.zero,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: const Color(0xFFFF7400),
+                  backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                      ? CachedNetworkImageProvider(avatarUrl)
+                      : null,
+                  child: avatarUrl == null || avatarUrl.isEmpty
+                      ? Text(
+                          displayName.isNotEmpty
+                              ? displayName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 20,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayName,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        userEmail,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        // プロフィールメニュー
+        PopupMenuItem<String>(
+          value: 'profile',
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF7400).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: Color(0xFFFF7400),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'プロフィール',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black87,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey[400],
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        // サインアウトメニュー
+        PopupMenuItem<String>(
+          value: 'signout',
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.logout,
+                  color: Colors.red,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'サインアウト',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+
 
   void _showBookmarkletDialog(BuildContext context) {
     if (kIsWeb) {
