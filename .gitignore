@@ -11,3 +11,4 @@ flutter_app/build/*
 # Environment
 .env*
 
+node_modules
