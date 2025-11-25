@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "build": "node build.js",
-        "build:prod": "TARGET_URL=https://hoshipad.vercel.app node build.js",
+        "build:prod": "TARGET_URL=https://hoshipad.com node build.js",
         "watch": "node build.js --watch"
     },
     "devDependencies": {
