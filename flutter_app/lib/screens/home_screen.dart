@@ -12,6 +12,7 @@ import '../providers/like_provider.dart';
 import '../widgets/recipe_card.dart';
 import '../widgets/hoshipad_logo.dart';
 import 'recipe_detail_screen.dart';
+import 'sharing_help_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,6 +53,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.ios_share, color: Colors.grey),
+                  tooltip: 'iOSで共有する方法',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const SharingHelpScreen(),
+                      ),
+                    );
+                  },
+                ),
                 IconButton(
                   icon: const Text('📌', style: TextStyle(fontSize: 24)),
                   tooltip: 'ブックマークレットを追加',
