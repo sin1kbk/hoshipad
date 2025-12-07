@@ -32,7 +32,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-6 pb-24 md:pb-8">
+      <main className="container mx-auto px-3 py-6 pb-24 sm:px-4 md:pb-8">
         {/* カテゴリーフィルター */}
         <CategoryFilter />
 
@@ -52,9 +52,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <p className="text-gray-500">レシピが見つかりませんでした</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} onLike={handleLike} />
+              <div key={recipe.id} className="flex w-full">
+                <RecipeCard recipe={recipe} onLike={handleLike} />
+              </div>
             ))}
           </div>
         )}
