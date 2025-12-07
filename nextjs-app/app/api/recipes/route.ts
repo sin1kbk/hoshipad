@@ -1,5 +1,36 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { searchRecipes, getAllRecipes } from '@/lib/api/recipes'
+import { RecipeSource } from '@/types/recipe'
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams
+    const query = searchParams.get('q') || undefined
+    const source = searchParams.get('source') as RecipeSource | null
+    const tag = searchParams.get('tag') || undefined
+    const page = parseInt(searchParams.get('page') || '0', 10)
+    const pageSize = parseInt(searchParams.get('pageSize') || '12', 10)
+
+    const result = query || source || tag
+      ? await searchRecipes({
+          query,
+          source: source || undefined,
+          tag,
+          page,
+          pageSize,
+        })
+      : await getAllRecipes(page, pageSize)
+
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error('Error fetching recipes:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch recipes' },
+      { status: 500 }
+    )
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,5 +1,5 @@
 import { getAllRecipes, searchRecipes } from '@/lib/api/recipes'
-import RecipeCard from '@/components/recipes/RecipeCard'
+import RecipeList from '@/components/recipes/RecipeList'
 import RecipeFilters from '@/components/recipes/RecipeFilters'
 import CategoryFilter from '@/components/recipes/CategoryFilter'
 import Header from '@/components/layout/Header'
@@ -19,9 +19,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const source = typeof params.source === 'string' ? params.source as RecipeSource : undefined
   const tag = typeof params.tag === 'string' ? params.tag : undefined
 
-  const recipes = query || source || tag
-    ? await searchRecipes({ query, source, tag })
-    : await getAllRecipes()
+  const result = query || source || tag
+    ? await searchRecipes({ query, source, tag, page: 0, pageSize: 12 })
+    : await getAllRecipes(0, 12)
+
+  const initialRecipes = result.recipes
 
   async function handleLike(recipeId: number) {
     'use server'
@@ -46,20 +48,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <RecipeFilters />
         </div>
 
-        {/* レシピ一覧 */}
-        {recipes.length === 0 ? (
-          <div className="py-12 text-center">
-            <p className="text-gray-500">レシピが見つかりませんでした</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {recipes.map((recipe) => (
-              <div key={recipe.id} className="flex w-full">
-                <RecipeCard recipe={recipe} onLike={handleLike} />
-              </div>
-            ))}
-          </div>
-        )}
+        {/* レシピ一覧（無限スクロール対応） */}
+        <RecipeList
+          initialRecipes={initialRecipes}
+          initialFilters={{ query, source, tag }}
+          onLike={handleLike}
+        />
       </main>
 
       <FloatingActionButton />

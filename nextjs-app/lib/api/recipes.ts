@@ -1,7 +1,31 @@
 import { createClient } from '@/lib/supabase/server'
 import { Recipe, InsertRecipe, UpdateRecipe, RecipeSource } from '@/types/recipe'
 
-export async function getAllRecipes(): Promise<Recipe[]> {
+export async function getAllRecipes(page: number = 0, pageSize: number = 12): Promise<{ recipes: Recipe[], hasMore: boolean }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const from = page * pageSize
+  const to = from + pageSize - 1
+
+  const { data, error } = await supabase
+    .from('recipes')
+    .select(`
+      *,
+      recipe_likes(user_id)
+    `, { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (error) throw error
+
+  const recipes = parseRecipesWithLikes(data || [], user?.id)
+  const hasMore = (data?.length || 0) === pageSize
+
+  return { recipes, hasMore }
+}
+
+export async function getRecipeById(id: number): Promise<Recipe | null> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -11,11 +35,19 @@ export async function getAllRecipes(): Promise<Recipe[]> {
       *,
       recipe_likes(user_id)
     `)
-    .order('created_at', { ascending: false })
+    .eq('id', id)
+    .single()
 
-  if (error) throw error
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // レシピが見つからない場合
+      return null
+    }
+    throw error
+  }
 
-  return parseRecipesWithLikes(data || [], user?.id)
+  const recipes = parseRecipesWithLikes([data], user?.id)
+  return recipes[0] || null
 }
 
 export async function getUserRecipes(userId: string): Promise<Recipe[]> {
@@ -40,16 +72,23 @@ export async function searchRecipes(params: {
   query?: string
   source?: RecipeSource
   tag?: string
-}): Promise<Recipe[]> {
+  page?: number
+  pageSize?: number
+}): Promise<{ recipes: Recipe[], hasMore: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  const page = params.page || 0
+  const pageSize = params.pageSize || 12
+  const from = page * pageSize
+  const to = from + pageSize - 1
 
   let queryBuilder = supabase
     .from('recipes')
     .select(`
       *,
       recipe_likes(user_id)
-    `)
+    `, { count: 'exact' })
 
   if (params.source) {
     queryBuilder = queryBuilder.eq('source', params.source)
@@ -65,11 +104,16 @@ export async function searchRecipes(params: {
     )
   }
 
-  const { data, error } = await queryBuilder.order('created_at', { ascending: false })
+  const { data, error } = await queryBuilder
+    .order('created_at', { ascending: false })
+    .range(from, to)
 
   if (error) throw error
 
-  return parseRecipesWithLikes(data || [], user?.id)
+  const recipes = parseRecipesWithLikes(data || [], user?.id)
+  const hasMore = (data?.length || 0) === pageSize
+
+  return { recipes, hasMore }
 }
 
 export async function createRecipe(recipe: InsertRecipe): Promise<Recipe> {
