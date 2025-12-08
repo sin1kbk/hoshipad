@@ -31,7 +31,7 @@ trigger: always_on
 
 - `src/`: 実装コードのみ。
 - `docs/`: 仕様書および計画書 (SSoT)。
-  - `docs/master_plan.md`: ハイレベル・アーキテクチャ。
+  - `docs/PROJECT_CONTEXT.md`: ハイレベル・アーキテクチャ。
   - `docs/active_tasks.md`: 現在実行中のタスクリスト。
   - `docs/features/<feature_name>/spec.md`: 詳細な機能仕様書。
 - `.antigravity/`: エージェント設定およびアーティファクト。
