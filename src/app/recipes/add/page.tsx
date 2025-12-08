@@ -129,11 +129,15 @@ export default function AddRecipePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* URL */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="url"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               レシピURL *
             </label>
             <div className="flex space-x-2">
               <input
+                id="url"
                 type="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
@@ -153,10 +157,14 @@ export default function AddRecipePage() {
 
           {/* タイトル */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="title"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               タイトル *
             </label>
             <input
+              id="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -167,10 +175,14 @@ export default function AddRecipePage() {
 
           {/* 画像URL */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="imageUrl"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               画像URL *
             </label>
             <input
+              id="imageUrl"
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
@@ -181,10 +193,14 @@ export default function AddRecipePage() {
 
           {/* ソース */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="source"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               ソース *
             </label>
             <select
+              id="source"
               value={source}
               onChange={(e) => setSource(e.target.value as RecipeSource)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
@@ -199,10 +215,14 @@ export default function AddRecipePage() {
 
           {/* メモ */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="notes"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               メモ
             </label>
             <textarea
+              id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
@@ -212,11 +232,15 @@ export default function AddRecipePage() {
 
           {/* タグ */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="tagInput"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               タグ
             </label>
             <div className="flex space-x-2">
               <select
+                id="tagInput"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"

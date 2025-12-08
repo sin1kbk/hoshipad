@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
@@ -28,10 +28,18 @@ export default function Header() {
     return () => subscription.unsubscribe()
   }, [])
 
+  const router = useRouter() // Import useRouter if not already imported? Wait, I need to check imports.
+  // Actually, let's look at imports first.
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // 検索処理
-    window.location.href = `/?q=${encodeURIComponent(searchQuery)}`
+    const params = new URLSearchParams(window.location.search)
+    if (searchQuery) {
+      params.set('q', searchQuery)
+    } else {
+      params.delete('q')
+    }
+    router.push(`/?${params.toString()}`)
   }
 
   const getUserInitial = () => {

@@ -3,22 +3,21 @@
 import { RECIPE_CATEGORIES } from '@/types/recipe'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
-  Beef, Fish, Salad, Rice, Noodles,
-  Soup, Cake, Bread, Package, Utensils
+  Utensils
 } from 'lucide-react'
 
 const categoryIcons: Record<string, any> = {
-  '肉料理': Beef,
-  '魚介料理': Fish,
-  '野菜料理': Salad,
-  'サラダ': Salad,
-  'ご飯もの': Rice,
-  '麺類': Noodles,
-  'スープ・汁物': Soup,
-  'お菓子': Cake,
-  'デザート': Cake,
-  'パン': Bread,
-  'お弁当': Package,
+  '肉料理': Utensils,
+  '魚介料理': Utensils,
+  '野菜料理': Utensils,
+  'サラダ': Utensils,
+  'ご飯もの': Utensils,
+  '麺類': Utensils,
+  'スープ・汁物': Utensils,
+  'お菓子': Utensils,
+  'デザート': Utensils,
+  'パン': Utensils,
+  'お弁当': Utensils,
   'その他': Utensils,
 }
 

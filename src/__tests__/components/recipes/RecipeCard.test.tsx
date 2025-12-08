@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import RecipeCard from '@/components/recipes/RecipeCard'
 import { Recipe } from '@/types/recipe'
 
@@ -29,7 +30,7 @@ describe('RecipeCard', () => {
   it('画像が正しいURLで表示される', () => {
     render(<RecipeCard recipe={mockRecipe} />)
 
-    const image = screen.getByAlt('テストレシピ')
+    const image = screen.getByAltText('テストレシピ')
     expect(image).toBeInTheDocument()
   })
 

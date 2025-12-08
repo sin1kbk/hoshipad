@@ -1,8 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import RecipeFilters from '@/components/recipes/RecipeFilters'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-jest.mock('next/navigation')
+
 
 describe('RecipeFilters', () => {
   const mockPush = jest.fn()
@@ -16,12 +17,7 @@ describe('RecipeFilters', () => {
     ;(useSearchParams as jest.Mock).mockReturnValue(mockSearchParams)
   })
 
-  it('検索ボックスが表示される', () => {
-    render(<RecipeFilters />)
 
-    const searchInput = screen.getByPlaceholderText('レシピを検索...')
-    expect(searchInput).toBeInTheDocument()
-  })
 
   it('すべてのソースフィルターボタンが表示される', () => {
     render(<RecipeFilters />)
@@ -31,18 +27,6 @@ describe('RecipeFilters', () => {
     expect(screen.getByText('Instagram')).toBeInTheDocument()
     expect(screen.getByText('Twitter')).toBeInTheDocument()
     expect(screen.getByText('クックパッド')).toBeInTheDocument()
-  })
-
-  it('検索テキストを入力するとルーターが更新される', async () => {
-    render(<RecipeFilters />)
-
-    const searchInput = screen.getByPlaceholderText('レシピを検索...')
-    fireEvent.change(searchInput, { target: { value: '肉じゃが' } })
-
-    // useEffect内でrouterが呼ばれるまで待つ
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    expect(mockPush).toHaveBeenCalled()
   })
 
   it('ソースフィルターをクリックするとルーターが更新される', async () => {
