@@ -12,11 +12,13 @@
 ## 2. Architecture
 
 ### Technology Stack
-- **Frontend**: Next.js 15 (App Router), React 18, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS
 - **Backend / BaaS**: Supabase (Auth, PostgreSQL Database, Storage)
 - **State Management**: Zustand + React Hooks
 - **Testing**: Jest (Unit), Playwright (E2E)
 - **Styling**: Tailwind CSS, Lucide React (Icons)
+- **Runtime**: Node.js v20.9+ (Next.js 16の要件)
+- **Linting**: ESLint 9+ (Next.js 16の要件)
 
 ### Directory Structure Strategy
 - `src/app`: Next.js App Router root.

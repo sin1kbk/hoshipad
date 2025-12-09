@@ -2,9 +2,9 @@
 
 ## Core Technologies
 
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript (strict mode enabled)
-- **Runtime**: Node.js v20+
+- **Runtime**: Node.js v20.9+
 - **Styling**: Tailwind CSS
 - **Icons**: lucide-react
 - **Backend**: Supabase (Auth + PostgreSQL + Storage)
