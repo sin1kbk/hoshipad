@@ -12,3 +12,6 @@ flutter_app/build/*
 .env*
 
 node_modules
+
+# Package manager lock files (using yarn)
+package-lock.json
