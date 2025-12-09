@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
@@ -14,9 +14,12 @@ interface HeaderClientProps {
 
 export default function HeaderClient({ initialUser }: HeaderClientProps) {
   const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState<User | null>(initialUser)
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  // 初期値はURLパラメータから取得
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '')
 
   useEffect(() => {
     const supabase = createClient()
@@ -26,18 +29,29 @@ export default function HeaderClient({ initialUser }: HeaderClientProps) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const router = useRouter()
+  // パス名が変更された時（ページ遷移時）のみ、URLパラメータから検索欄を同期
+  useEffect(() => {
+    if (pathname === '/') {
+      const queryParam = searchParams.get('q') || ''
+      setSearchQuery(queryParam)
+    } else {
+      // ホームページ以外では検索欄をクリア
+      setSearchQuery('')
+    }
+  }, [pathname]) // pathnameのみを監視（ページ遷移時のみ同期）
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     // 検索処理
-    const params = new URLSearchParams(window.location.search)
-    if (searchQuery) {
-      params.set('q', searchQuery)
+    const params = new URLSearchParams(searchParams.toString())
+    const trimmedQuery = searchQuery.trim()
+    if (trimmedQuery) {
+      params.set('q', trimmedQuery)
     } else {
       params.delete('q')
     }
-    router.push(`/?${params.toString()}`)
+    const newUrl = params.toString() ? `/?${params.toString()}` : '/'
+    router.push(newUrl)
   }
 
   const getUserInitial = () => {
