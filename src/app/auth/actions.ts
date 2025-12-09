@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 
-export async function signIn(formData: FormData) {
+export async function signIn(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
@@ -16,13 +16,14 @@ export async function signIn(formData: FormData) {
   })
 
   if (error) {
+    console.error('Login error:', error.message)
     return { error: error.message }
   }
 
-  redirect('/')
+  return redirect('/')
 }
 
-export async function signUp(formData: FormData) {
+export async function signUp(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
@@ -38,10 +39,11 @@ export async function signUp(formData: FormData) {
   })
 
   if (error) {
+    console.error('Signup error:', error.message)
     return { error: error.message }
   }
 
-  redirect('/auth/verify-email')
+  return redirect('/auth/verify-email')
 }
 
 export async function signOut() {

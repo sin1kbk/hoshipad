@@ -1,7 +1,16 @@
+'use client'
+
+import { useActionState } from 'react'
 import { signUp } from '../actions'
 import Link from 'next/link'
 
+const initialState = {
+  error: '',
+}
+
 export default function SignupPage() {
+  const [state, formAction] = useActionState(signUp, initialState)
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
@@ -12,7 +21,21 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" action={signUp}>
+        <form className="mt-8 space-y-6" action={formAction}>
+           {state?.error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    登録エラー
+                  </h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>{state.error}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
