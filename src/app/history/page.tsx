@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/layout/Header'
+import HeaderClient from '@/components/layout/HeaderClient'
 import BottomNav from '@/components/layout/BottomNav'
 import RecipeCard from '@/components/recipes/RecipeCard'
 import { getHistoryRecipeIds, clearHistory } from '@/lib/history'
@@ -83,7 +83,7 @@ export default function HistoryPage() {
 
   return (
     <>
-      <Header />
+      <HeaderClient initialUser={null} />
       <main className="container mx-auto px-3 py-6 pb-24 sm:px-4 md:pb-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">最近見たレシピ</h1>

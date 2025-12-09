@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/layout/Header'
+import HeaderClient from '@/components/layout/HeaderClient'
 import BottomNav from '@/components/layout/BottomNav'
 import RecipeCard from '@/components/recipes/RecipeCard'
 import { Recipe } from '@/types/recipe'
@@ -57,7 +57,7 @@ export default function ProfilePageClient({
 
   return (
     <>
-      <Header />
+      <HeaderClient initialUser={null} />
       <main className="container mx-auto px-3 py-6 pb-24 sm:px-4 md:pb-8">
         {/* プロフィールカード */}
         <div className="mb-6 rounded-lg bg-white p-6 shadow-md">

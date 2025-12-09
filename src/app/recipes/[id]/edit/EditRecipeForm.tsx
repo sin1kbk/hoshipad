@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/layout/Header'
+import HeaderClient from '@/components/layout/HeaderClient'
 import {
   RECIPE_SOURCES,
   RECIPE_CATEGORIES,
@@ -129,7 +129,7 @@ export default function EditRecipeForm({ recipe }: EditRecipeFormProps) {
 
   return (
     <>
-      <Header />
+      <HeaderClient initialUser={null} />
       <main className="container mx-auto max-w-3xl px-4 py-8">
         <h1 className="mb-8 text-3xl font-bold text-gray-900">レシピを編集</h1>
 

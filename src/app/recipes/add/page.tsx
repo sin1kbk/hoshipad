@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Header from '@/components/layout/Header'
+import HeaderClient from '@/components/layout/HeaderClient'
 import {
   RECIPE_SOURCES,
   RECIPE_CATEGORIES,
@@ -12,7 +12,7 @@ import {
 } from '@/types/recipe'
 import { Plus, Trash2 } from 'lucide-react'
 
-export default function AddRecipePage() {
+function AddRecipeForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -122,7 +122,7 @@ export default function AddRecipePage() {
 
   return (
     <>
-      <Header />
+      <HeaderClient initialUser={null} />
       <main className="container mx-auto max-w-3xl px-4 py-8">
         <h1 className="mb-8 text-3xl font-bold text-gray-900">レシピを追加</h1>
 
@@ -347,5 +347,13 @@ export default function AddRecipePage() {
         </form>
       </main>
     </>
+  )
+}
+
+export default function AddRecipePage() {
+  return (
+    <Suspense fallback={<div>読み込み中...</div>}>
+      <AddRecipeForm />
+    </Suspense>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Header from '@/components/layout/Header'
+import HeaderClient from '@/components/layout/HeaderClient'
 import BottomNav from '@/components/layout/BottomNav'
 import {
   getShoppingList,
@@ -65,7 +65,7 @@ export default function ShoppingListPage() {
 
   return (
     <>
-      <Header />
+      <HeaderClient initialUser={null} />
       <main className="container mx-auto px-3 py-6 pb-24 sm:px-4 md:pb-8 max-w-2xl">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">買い物リスト</h1>

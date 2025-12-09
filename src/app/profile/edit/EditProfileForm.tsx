@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/layout/Header'
+import HeaderClient from '@/components/layout/HeaderClient'
 import { User } from '@supabase/supabase-js'
 import { ArrowLeft } from 'lucide-react'
 
@@ -41,7 +41,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
 
   return (
     <>
-      <Header />
+      <HeaderClient initialUser={null} />
       <main className="container mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => router.back()}
