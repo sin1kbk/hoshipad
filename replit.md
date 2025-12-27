@@ -53,3 +53,6 @@ cd src && npm run dev -- -p 5000 -H 0.0.0.0
 - Shopping list management
 - Viewing history tracking
 - Profile management
+
+## User Preferences
+- Communication language: Japanese (日本語)
